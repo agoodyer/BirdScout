@@ -1,74 +1,157 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Image} from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
+
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { useRef, useState } from 'react';
+import { Button, Text, TouchableOpacity, View } from 'react-native';
+
+
+export default function IdentifyScreen() {
+
+    const [facing, setFacing] = useState<CameraType>('back');
+    const [permission, requestPermission] = useCameraPermissions();
+
+    const [photo, setPhoto] = useState(null); //???
+    const [uri, setUri] = useState<string | undefined>(undefined);
+
+
+    const ref = useRef<CameraView>(null);
+
+    const takePicture = async () => {
+        const photo = await ref.current?.takePictureAsync();
+        setUri(photo?.uri);
+
+        console.log(photo);
+    };
+
+    const discardPicture = () => {
+
+        setUri(undefined);
+
+    }
+
+
+    if (!permission) {
+        // Camera permissions are still loading.
+        return <View />;
+    }
+
+    if (!permission.granted) {
+        // Camera permissions are not granted yet.
+        return (
+            <View style={styles.container}>
+                <Text style={styles.message}>We need your permission to show the camera</Text>
+                <Button onPress={requestPermission} title="grant permission" />
+            </View>
+        );
+    }
+
+    function toggleCameraFacing() {
+        setFacing(current => (current === 'back' ? 'front' : 'back'));
+    }
+
+
+    return (
+
+        <View style={styles.container}>
+
+            {!uri ? (<CameraView style={styles.camera} facing={facing} ref={ref}>
+                <View style={styles.overlay}>
+
+                    <View style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 60 }}>
+
+                        <TouchableOpacity>
+                            <MaterialIcons name="photo-library" size={40} color="white" />
+                        </TouchableOpacity>
+
+
+
+                        <TouchableOpacity style={{ borderWidth: 4, borderColor: 'white', width: 80, height: 80, borderRadius: '50%', justifyContent: 'center', alignItems: 'center' }} onPress={takePicture}>
+                            <View style={{ backgroundColor: 'white', width: '90%', height: '90%', borderRadius: '50%' }}>
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={toggleCameraFacing}>
+                            <FontAwesome6 name="rotate" size={40} color="white" />
+                        </TouchableOpacity>
+
+                    </View>
+
+                </View>
+            </CameraView>) : (<>
+
+                <View style={{ width: '100%', height: '100%' }}>
+                    <TouchableOpacity onPress={discardPicture} style={{position:'absolute', top:20,right:20, zIndex:10, padding:5, backgroundColor:'white', borderRadius:'50%'}}>
+                    <MaterialIcons name="delete-forever" size={40} color="red" />
+                    </TouchableOpacity>
+                    <Image source={{ uri: uri }} style={{ flex: 1, resizeMode: 'contain' }} />
+                </View>
+
+
+            </>)}
+
+        </View>
+    );
+
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    headerImage: {
+        color: '#808080',
+        bottom: -90,
+        left: -35,
+        position: 'absolute',
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    message: {
+        textAlign: 'center',
+        paddingBottom: 10,
+    },
+    camera: {
+        flex: 1,
+    },
+    buttonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        margin: 64,
+    },
+    button: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+    },
+    text: {
+        position: 'absolute',
+        top: -100,
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'red',
+    },
+
+    overlay: {
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+
+        display: 'flex',
+        opacity: 0.4,
+        alignItems: 'center',
+
+        justifyContent: 'flex-end',
+        padding: '30%'
+
+    }
 });
+
