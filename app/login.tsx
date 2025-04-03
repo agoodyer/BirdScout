@@ -5,6 +5,9 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../store/firebaseConfig";
@@ -27,7 +30,18 @@ export default function Login({ setIsLoggedIn }: any) {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <View style={{ flexDirection: "row", alignItems: "center"}}>
+        <Image
+          source={require("@/assets/images/icon_silhouette.png")}
+          style={{ width: 180, opacity: 0.8 }}
+          resizeMode="contain"
+        />
+      </View>
+
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
@@ -55,15 +69,14 @@ export default function Login({ setIsLoggedIn }: any) {
         style={styles.linkContainer}
       >
         <Text style={styles.linkText}>Don't have an account? Register</Text>
-      </TouchableOpacity>
-    </View>
+      </TouchableOpacity>      
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     padding: 20,
     backgroundColor: "#F5F7FA",
@@ -72,7 +85,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   input: {
     width: "100%",
@@ -83,6 +96,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#FFF",
     fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2, // Android shadow
   },
   button: {
     width: "100%",
