@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -49,7 +51,10 @@ export default function Register() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+          style={styles.container}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Text style={styles.title}>Register</Text>
       <TextInput
         placeholder="Email"
@@ -84,7 +89,10 @@ export default function Register() {
       <TouchableOpacity onPress={() => router.back()}>
         <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
-    </View>
+    <View style={{justifyContent:'center', alignItems:'center', paddingTop:20}}>
+      <Text style={{textAlign:'center', opacity:0.4 }}>By clicking continue, you agree to our <Text style={{textDecorationLine:'underline'}}>Terms of Service </Text> and <Text style={{textDecorationLine:'underline'}}> Privacy Policy.</Text></Text>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
