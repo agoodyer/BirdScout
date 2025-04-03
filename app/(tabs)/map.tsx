@@ -15,6 +15,11 @@ import { LocationObjectCoords } from 'expo-location';
 
 
 import { markers } from '../../assets/markers';
+
+import { Sighting } from '../types/sighting';
+
+import { sightings } from '@/assets/sightings';
+
 import LottieView from 'lottie-react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
@@ -109,8 +114,8 @@ export default function TabTwoScreen() {
         showsMyLocationButton
         ref={mapRef}
       >
-        {markers.map((marker, index) => (
-          <Marker key={index} coordinate={marker}
+        {sightings.map((sighting, index) => (
+          <Marker key={index} coordinate={sighting.artifact.location}
             style={{ opacity: 0 }}
             icon={require('../../assets/images/icon.png')}
             pinColor='#00BDFF'
@@ -132,7 +137,7 @@ export default function TabTwoScreen() {
                 <Text>{marker.title}</Text>
               </View> */}
 
-              <MapSighting commonName={marker.title} speciesName="Species Name" date="April 1, 2004" image="aaa"></MapSighting>
+              <MapSighting sighting={sighting}></MapSighting>
 
             </Callout>
 
@@ -145,7 +150,7 @@ export default function TabTwoScreen() {
 
 
 
-const MapSighting = ({ commonName, speciesName, image, date }: { commonName: string; speciesName: string; image: string, date: string }) => {
+const MapSighting = ({ sighting }: { sighting:Sighting }) => {
 
   const router = useRouter();
   return (
@@ -154,16 +159,16 @@ const MapSighting = ({ commonName, speciesName, image, date }: { commonName: str
 
   <View style={{ height:200, justifyContent:'center', gap:10 }}>
     <Image
-      source={require('@/assets/images/canada_goose.jpeg')}
+      source={{uri:sighting.artifact.imageUrl}}
       style={{ width: 200, height: 100, borderRadius: 10 }}
 
     />
-    <Text style={{ fontWeight: 'bold', width:'100%' }}>{commonName}</Text>
-    <Text style={{  width:'100%' }}>{speciesName}</Text>
+    <Text style={{ fontWeight: 'bold', width:'100%' }}>{sighting.commonName}</Text>
+    <Text style={{  width:'100%' }}>{sighting.speciesName}</Text>
 
     <View style={{ flexDirection: 'row', gap: 4, alignItems:'center'}}>
       <MaterialIcons name="calendar-month" size={24} color={'black'} />
-      <Text>{date}</Text>
+      <Text>{sighting.artifact.date}</Text>
     </View>
     </View>
 
