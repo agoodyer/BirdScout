@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system';
 
 // Initialize OpenAI client with API key from environment variable
 const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY || 'your-api-key-here', // Fallback if env var not loaded
+  apiKey: OPENAI_API_KEY || 'YOUR-API-KEY-HERE', // Use environment variable or a placeholder
 });
 
 // Bird identification response type
