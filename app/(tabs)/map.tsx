@@ -1,4 +1,4 @@
-import { StyleSheet, Image, Platform, View, Alert, Text } from 'react-native';
+import { StyleSheet, Image, Platform, View, Alert, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -16,6 +16,8 @@ import { LocationObjectCoords } from 'expo-location';
 
 import { markers } from '../../assets/markers';
 import LottieView from 'lottie-react-native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter } from 'expo-router';
 
 const onMarkerSelected = (marker: any) => {
   Alert.alert(marker.title);
@@ -65,24 +67,24 @@ export default function TabTwoScreen() {
   if (!hasPermission || !locationEnabled || !userLocation) {
     return (
       <View style={styles.container}>
-        <View style={{width:'100%', height:'100%', justifyContent:'center', alignItems:'center'}}>
+        <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
 
-       
-              <View style={styles.animationContainer}>
-             
-              <LottieView
-                autoPlay
-                ref={animation}
-                style={{
-                  width: 150,
-                  height: 150,
-                
-                }}
-                source={require('../../assets/animations/warn.json')}
-              />
-               <ThemedText type='defaultSemiBold'>You need to enable location services to proceed.</ThemedText>
-            </View>
-         
+
+          <View style={styles.animationContainer}>
+
+            <LottieView
+              autoPlay
+              ref={animation}
+              style={{
+                width: 150,
+                height: 150,
+
+              }}
+              source={require('../../assets/animations/warn.json')}
+            />
+            <ThemedText type='defaultSemiBold'>You need to enable location services to proceed.</ThemedText>
+          </View>
+
         </View>
       </View>
     );
@@ -117,19 +119,20 @@ export default function TabTwoScreen() {
             {/* <View>
             <Text>{marker.title}</Text>
             </View> */}
-         
+
             <Callout>
 
-              <View style={{ padding: 10, width:200,height:200 }}>
-                
+              {/* <View style={{ padding: 10, width: 200, height: 200 }}>
 
                 <Image
-                        source={require('@/assets/images/canada_goose.jpeg')}
-                        style={{ width: 200, height: 100, }}
-                        resizeMode="contain"
-                    />
-                    <Text>{marker.title}</Text>
-              </View>
+                  source={require('@/assets/images/canada_goose.jpeg')}
+                  style={{ width: 200, height: 100, }}
+                  resizeMode="contain"
+                />
+                <Text>{marker.title}</Text>
+              </View> */}
+
+              <MapSighting commonName={marker.title} speciesName="Species Name" date="April 1, 2004" image="aaa"></MapSighting>
 
             </Callout>
 
@@ -140,6 +143,37 @@ export default function TabTwoScreen() {
   );
 }
 
+
+
+const MapSighting = ({ commonName, speciesName, image, date }: { commonName: string; speciesName: string; image: string, date: string }) => {
+
+  const router = useRouter();
+  return (
+  
+  
+
+  <View style={{ height:200, justifyContent:'center', gap:10 }}>
+    <Image
+      source={require('@/assets/images/canada_goose.jpeg')}
+      style={{ width: 200, height: 100, borderRadius: 10 }}
+
+    />
+    <Text style={{ fontWeight: 'bold', width:'100%' }}>{commonName}</Text>
+    <Text style={{  width:'100%' }}>{speciesName}</Text>
+
+    <View style={{ flexDirection: 'row', gap: 4, alignItems:'center'}}>
+      <MaterialIcons name="calendar-month" size={24} color={'black'} />
+      <Text>{date}</Text>
+    </View>
+    </View>
+
+ 
+  
+);
+
+}
+
+
 const styles = StyleSheet.create({
 
   container: {
@@ -148,9 +182,9 @@ const styles = StyleSheet.create({
   map: {
     width: '100%',
     height: '100%',
-  }, 
+  },
   animationContainer: {
-    width:'100%',
+    width: '100%',
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
