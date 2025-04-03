@@ -7,6 +7,10 @@ import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { useRef, useState } from "react";
 import { Button, Text, TouchableOpacity, View } from "react-native";
 
+import { createClient } from "@supabase/supabase-js";
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from "expo-file-system";
+
 export default function IdentifyScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
@@ -15,6 +19,38 @@ export default function IdentifyScreen() {
   const [uri, setUri] = useState<string | undefined>(undefined);
 
   const ref = useRef<CameraView>(null);
+
+// Initialize Supabase client
+const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+
+
+// EXPO_PUBLIC_SUPABASE_URL=https://silypxhanlxapseqeqtt.supabase.co
+// EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4
+
+
+//secret 97f16bb965ab9c1107898dfcafb56b2988e3dfe75ae4bc2c3e91954224fec4fb
+
+
+
+const pickImage = async () => {
+  // No permissions request is necessary for launching the image library
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images', 'videos'],
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 0.1,
+  });
+
+  console.log(result);
+
+  if (!result.canceled) {
+    setUri(result.assets[0].uri);
+  }
+};
+
 
   const takePicture = async () => {
     const photo = await ref.current?.takePictureAsync();
@@ -25,6 +61,67 @@ export default function IdentifyScreen() {
 
   const discardPicture = () => {
     setUri(undefined);
+  };
+
+
+  const base64ToArrayBuffer = (base64: string) => {
+    const binaryString = atob(base64);
+    const length = binaryString.length;
+    const arrayBuffer = new ArrayBuffer(length);
+    const view = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < length; i++) {
+      view[i] = binaryString.charCodeAt(i);
+    }
+
+    return arrayBuffer;
+  };
+
+
+  const uploadPhoto = async() =>{
+
+    if(!uri) return; 
+
+    try{
+      const fileUri = uri; 
+      const fileName = fileUri.split('/').pop()!;
+      // const fileType = mime.getType(fileUri); 
+
+      const response = await fetch(uri); 
+
+      if (!response.ok) {
+        console.error('Failed to fetch image:', response.statusText);
+        return;
+      }
+
+
+      const base64 = await FileSystem.readAsStringAsync(fileUri,{
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+
+      const arrayBuffer = base64ToArrayBuffer(base64);
+
+      const filePath = `${fileName}`;
+      
+      const {data, error} = await supabase.storage.from("birds").upload(filePath,arrayBuffer, {
+        upsert: true,
+        contentType: 'image/jpeg',
+      }); 
+
+      if(error){
+        console.log(error); 
+      }
+      console.log("File uploaded successfully:", data);
+
+
+
+    }catch (error) {
+      console.error("Error uploading file:", error);
+    }
+
+
+
   };
 
   if (!permission) {
@@ -63,7 +160,7 @@ export default function IdentifyScreen() {
                 gap: 60,
               }}
             >
-              <TouchableOpacity>
+              <TouchableOpacity onPress={pickImage}>
                 <MaterialIcons name="photo-library" size={40} color="white" />
               </TouchableOpacity>
 
@@ -111,6 +208,21 @@ export default function IdentifyScreen() {
               }}
             >
               <MaterialIcons name="delete-forever" size={40} color="red" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={uploadPhoto}
+              style={{
+                position: "absolute",
+                top: 20,
+                left: 20,
+                zIndex: 10,
+                padding: 5,
+                backgroundColor: "white",
+                borderRadius: 100,
+              }}
+            >
+              <MaterialIcons name="cloud-upload" size={40} color="green" />
             </TouchableOpacity>
             <Image
               source={{ uri: uri }}
