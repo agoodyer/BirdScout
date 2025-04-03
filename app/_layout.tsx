@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { initializeStorage } from "../services/storageService";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -22,9 +23,23 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    // Initialize storage and hide splash screen when loaded
+    async function initialize() {
+      if (loaded) {
+        try {
+          // Initialize local storage for bird images
+          await initializeStorage();
+          console.log('Storage initialized successfully');
+        } catch (error) {
+          console.error('Error initializing storage:', error);
+        } finally {
+          // Hide splash screen regardless of storage initialization result
+          await SplashScreen.hideAsync();
+        }
+      }
     }
+    
+    initialize();
   }, [loaded]);
 
   if (!loaded) {
