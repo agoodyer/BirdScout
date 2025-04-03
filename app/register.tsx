@@ -61,12 +61,14 @@ export default function Register() {
         value={email}
         onChangeText={setEmail}
         style={styles.input}
+        placeholderTextColor="#666"
       />
       <TextInput
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
         style={styles.input}
+        placeholderTextColor="#666"
       />
       <TextInput
         placeholder="Phone Number"
@@ -74,6 +76,7 @@ export default function Register() {
         onChangeText={setPhone}
         keyboardType="phone-pad"
         style={styles.input}
+        placeholderTextColor="#666"
       />
       <TextInput
         placeholder="Password"
@@ -81,6 +84,7 @@ export default function Register() {
         onChangeText={setPassword}
         secureTextEntry
         style={styles.input}
+        placeholderTextColor="#666"
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <TouchableOpacity onPress={handleRegister} style={styles.button}>
