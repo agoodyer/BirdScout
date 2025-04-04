@@ -7,12 +7,14 @@ import { Platform } from "react-native";
 import { auth, db } from "../store/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Profile() {
   const [phone, setPhone] = useState("No phone number found");
 
   const router = useRouter();
   const isAndroid = Platform.OS === "android";
+  const [isPremium, setIsPremium] = useState(false);
 
   const user = auth.currentUser;
 
@@ -30,6 +32,15 @@ export default function Profile() {
     fetchPhone();
   }, [user]);
 
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      const premiumStatus = await AsyncStorage.getItem("isPremium");
+      setIsPremium(premiumStatus === "true");
+    };
+  
+    checkPremiumStatus();
+  }, []);
+  
   return (
     <>
       {/* Header */}
@@ -66,11 +77,19 @@ export default function Profile() {
             </ThemedText>
             <ThemedText style={styles.value}>{user?.email}</ThemedText>
           </View>
-          <View style={styles.infoRowLast}>
+          <View style={styles.infoRow}>
             <ThemedText type="subtitle" style={styles.label}>
               Phone Number
             </ThemedText>
             <ThemedText style={styles.value}>{phone}</ThemedText>
+          </View>
+          <View style={styles.infoRowLast}>
+          <ThemedText type="subtitle" style={styles.label}>
+              Account Status
+            </ThemedText>
+            <ThemedText style={styles.value}>
+              {isPremium ? "Premium" : "Free"}
+            </ThemedText>
           </View>
         </View>
         {/* Edit Button */}
