@@ -7,5 +7,6 @@ export interface Artifact{
       };   
     date: string;
     imageUrl: string; 
-
+    username: string;
+    textDescription?: string;
 }
