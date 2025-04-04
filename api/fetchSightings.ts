@@ -9,14 +9,15 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // either fetch all sigtings for a username, or return ALL sightings
 export const fetchSightings = async(username: string | null = null) =>{
 
+  console.log('fetching sightings!');
+
   let query = supabase.from('sightings').select(
 `
-    id,
+    artifact_id,
     common_name,
     species_name,
-    artifact_id,
     created_at,
-    artifacts (
+    artifacts!fk_artifact_id (
       id,
       latitude,
       longitude,
@@ -37,6 +38,7 @@ export const fetchSightings = async(username: string | null = null) =>{
 
   const { data, error } = await query;
 
+
   if (error) {
     console.error('Failed to fetch sightings:', error);
     return;
@@ -49,9 +51,8 @@ export const fetchSightings = async(username: string | null = null) =>{
     const artifact = row.artifacts; 
 
 
-
     return new Sighting(
-      row.id.toString(), 
+      row.artifact_id,
       row.common_name, 
       row.species_name, 
       {
@@ -75,7 +76,7 @@ export const fetchSightings = async(username: string | null = null) =>{
   }); 
 
 
-
+  console.log(databaseSightings)
 
   // const baseUrl = "https://<your-project-ref>.supabase.co/storage/v1/object/public/<bucket-name>/";
   // const fullUrl = `${baseUrl}${imagePath}`;
