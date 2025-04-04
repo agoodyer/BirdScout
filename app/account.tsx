@@ -22,8 +22,10 @@ import { Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { SettingsButton } from "@/components/birdscout/SettingsButton";
+import { auth } from "@/store/firebaseConfig";
 export default function Account() {
   const router = useRouter();
+  const user = auth.currentUser;
 
   return (
     <>
@@ -42,8 +44,7 @@ export default function Account() {
             style={{ width: 120, height: 120, borderRadius: 100 }}
             resizeMode="contain"
           />
-          <ThemedText type="subtitle">Ridha Khedri</ThemedText>
-          <ThemedText type="default">@sfwreng3a04</ThemedText>
+          <ThemedText type="default">@{user.displayName}</ThemedText>
         </ThemedView>
 
         <SettingsButton text={"Payment Information"} route={"/payment"} />
