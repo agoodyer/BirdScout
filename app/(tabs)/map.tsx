@@ -1,11 +1,7 @@
-import { StyleSheet, Image, Platform, View, Alert, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Image, Platform, View,Text} from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+
 
 
 import MapView, { Callout, Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -14,19 +10,13 @@ import { useEffect, useRef, useState } from 'react';
 import { LocationObjectCoords } from 'expo-location';
 
 
-import { markers } from '../../assets/markers';
 
 import { Sighting } from '../types/sighting';
-
-import { sightings } from '@/assets/sightings';
 
 import LottieView from 'lottie-react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
-
-const onMarkerSelected = (marker: any) => {
-  Alert.alert(marker.title);
-}
+import { fetchSightings } from '@/api/fetchSightings';
 
 
 export default function TabTwoScreen() {
@@ -37,6 +27,9 @@ export default function TabTwoScreen() {
 
   const mapRef = useRef<any>();
   const animation = useRef<LottieView>(null);
+
+    const [sightings, setSightings] = useState<Sighting[]>([]);
+    useEffect(() => { fetchSightings().then(setSightings) }, []);
 
 
   useEffect(() => {
@@ -120,25 +113,8 @@ export default function TabTwoScreen() {
             icon={require('../../assets/images/icon.png')}
             pinColor='#00BDFF'
           >
-
-            {/* <View>
-            <Text>{marker.title}</Text>
-            </View> */}
-
             <Callout>
-
-              {/* <View style={{ padding: 10, width: 200, height: 200 }}>
-
-                <Image
-                  source={require('@/assets/images/canada_goose.jpeg')}
-                  style={{ width: 200, height: 100, }}
-                  resizeMode="contain"
-                />
-                <Text>{marker.title}</Text>
-              </View> */}
-
               <MapSighting sighting={sighting}></MapSighting>
-
             </Callout>
 
           </Marker>
@@ -152,12 +128,9 @@ export default function TabTwoScreen() {
 
 const MapSighting = ({ sighting }: { sighting:Sighting }) => {
 
-  const router = useRouter();
   return (
   
-  
-
-  <View style={{ height:200, justifyContent:'center', gap:10 }}>
+  <View style={{ height:200, justifyContent:'center', gap:4 }}>
     <Image
       source={{uri:sighting.artifact.imageUrl}}
       style={{ width: 200, height: 100, borderRadius: 10 }}
@@ -170,6 +143,12 @@ const MapSighting = ({ sighting }: { sighting:Sighting }) => {
       <MaterialIcons name="calendar-month" size={24} color={'black'} />
       <Text>{sighting.artifact.date}</Text>
     </View>
+
+    <View style={{ flexDirection: 'row', gap: 4, alignItems:'center'}}>
+      <MaterialIcons name="person" size={24} color={'black'} />
+      <Text>{sighting.artifact.username}</Text>
+    </View>
+
     </View>
 
  
