@@ -1,17 +1,50 @@
 import { StyleSheet, Image } from "react-native";
 
+import * as Location from 'expo-location';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Text, TouchableOpacity, View } from "react-native";
+
+
+import { auth, db } from "../../store/firebaseConfig";
 
 import { createClient } from "@supabase/supabase-js";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 
+
+const useLocation = () => {
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      // Request permission
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Permission to access location was denied');
+        return;
+      }
+
+      // Get current location
+      const { coords } = await Location.getCurrentPositionAsync({});
+      setLocation({ latitude: coords.latitude, longitude: coords.longitude });
+    })();
+  }, []);
+
+  return location;
+};
+
+
+
+
 export default function IdentifyScreen() {
+
+  const location = useLocation();
+
+  
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -32,6 +65,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 //secret 97f16bb965ab9c1107898dfcafb56b2988e3dfe75ae4bc2c3e91954224fec4fb
+
+
 
 
 
@@ -113,6 +148,50 @@ const pickImage = async () => {
         console.log(error); 
       }
       console.log("File uploaded successfully:", data);
+
+      const imagePath = data.path; 
+
+      const latitude = location.latitude
+      const longitude = location.longitude
+
+      const username = auth.currentUser?.displayName || 'anonymous';
+
+      
+    
+      const {data: artifactData, error:insertError} = await supabase.from('artifacts').insert({
+        latitude, 
+        longitude, 
+        image_path:imagePath, 
+        username
+      }).select(); 
+
+      if (insertError) {
+        console.error('Failed to insert artifact data:', insertError);
+        return;
+      }
+    
+    console.log('Artifact data inserted successfully!');
+    const artifactId = artifactData?.[0]?.id;
+
+    console.log(artifactId);
+
+
+    //Temporary code to insert dummy value into sightings DB
+    const { error: sightingError } = await supabase
+    .from('sightings')
+    .insert({
+        artifact_id: artifactId, 
+        common_name: 'Bird Name', 
+        species_name: 'Bird Species', 
+        description: 'Reasoning for chosen classification.'
+    }); 
+
+
+    if(sightingError){
+      console.error("Failed to insert into sightings: ", sightingError)
+    }else{
+      console.log('Sighting inserted successfully. ');
+    }
 
 
 
