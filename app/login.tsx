@@ -32,9 +32,10 @@ export default function Login({ setIsLoggedIn }: any) {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <View style={{ flexDirection: "row", alignItems: "center"}}>
+      keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image
           source={require("@/assets/images/icon_silhouette.png")}
           style={{ width: 180, opacity: 0.8 }}
@@ -65,11 +66,15 @@ export default function Login({ setIsLoggedIn }: any) {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => router.navigate("/register")}
+        onPress={() => {
+          router.navigate("/register");
+          setEmail("");
+          setPassword("");
+        }}
         style={styles.linkContainer}
       >
         <Text style={styles.linkText}>Don't have an account? Register</Text>
-      </TouchableOpacity>      
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
