@@ -44,7 +44,7 @@ export default function IdentifyScreen() {
 
   const location = useLocation();
 
-  
+
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -53,38 +53,38 @@ export default function IdentifyScreen() {
 
   const ref = useRef<CameraView>(null);
 
-// Initialize Supabase client
-const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
-const supabase = createClient(supabaseUrl, supabaseKey);
+  // Initialize Supabase client
+  const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
-// EXPO_PUBLIC_SUPABASE_URL=https://silypxhanlxapseqeqtt.supabase.co
-// EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4
+  // EXPO_PUBLIC_SUPABASE_URL=https://silypxhanlxapseqeqtt.supabase.co
+  // EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4
 
 
-//secret 97f16bb965ab9c1107898dfcafb56b2988e3dfe75ae4bc2c3e91954224fec4fb
+  //secret 97f16bb965ab9c1107898dfcafb56b2988e3dfe75ae4bc2c3e91954224fec4fb
 
 
 
 
 
-const pickImage = async () => {
-  // No permissions request is necessary for launching the image library
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ['images', 'videos'],
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 0.1,
-  });
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.1,
+    });
 
-  console.log(result);
+    console.log(result);
 
-  if (!result.canceled) {
-    setUri(result.assets[0].uri);
-  }
-};
+    if (!result.canceled) {
+      setUri(result.assets[0].uri);
+    }
+  };
 
 
   const takePicture = async () => {
@@ -113,16 +113,16 @@ const pickImage = async () => {
   };
 
 
-  const uploadPhoto = async() =>{
+  const uploadPhoto = async () => {
 
-    if(!uri) return; 
+    if (!uri) return;
 
-    try{
-      const fileUri = uri; 
+    try {
+      const fileUri = uri;
       const fileName = fileUri.split('/').pop()!;
       // const fileType = mime.getType(fileUri); 
 
-      const response = await fetch(uri); 
+      const response = await fetch(uri);
 
       if (!response.ok) {
         console.error('Failed to fetch image:', response.statusText);
@@ -130,7 +130,7 @@ const pickImage = async () => {
       }
 
 
-      const base64 = await FileSystem.readAsStringAsync(fileUri,{
+      const base64 = await FileSystem.readAsStringAsync(fileUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
@@ -138,64 +138,71 @@ const pickImage = async () => {
       const arrayBuffer = base64ToArrayBuffer(base64);
 
       const filePath = `${fileName}`;
-      
-      const {data, error} = await supabase.storage.from("birds").upload(filePath,arrayBuffer, {
+
+      const { data, error } = await supabase.storage.from("birds").upload(filePath, arrayBuffer, {
         upsert: true,
         contentType: 'image/jpeg',
-      }); 
+      });
 
-      if(error){
-        console.log(error); 
+      if (error) {
+        console.log(error);
       }
       console.log("File uploaded successfully:", data);
 
-      const imagePath = data.path; 
+      const imagePath = data.path;
 
       const latitude = location.latitude
       const longitude = location.longitude
 
       const username = auth.currentUser?.displayName || 'anonymous';
 
-      
-    
-      const {data: artifactData, error:insertError} = await supabase.from('artifacts').insert({
-        latitude, 
-        longitude, 
-        image_path:imagePath, 
+
+
+      const { data: artifactData, error: insertError } = await supabase.from('artifacts').insert({
+        latitude,
+        longitude,
+        image_path: imagePath,
         username
-      }).select(); 
+      }).select();
 
       if (insertError) {
         console.error('Failed to insert artifact data:', insertError);
         return;
       }
-    
-    console.log('Artifact data inserted successfully!');
-    const artifactId = artifactData?.[0]?.id;
 
-    console.log(artifactId);
+      console.log('Artifact data inserted successfully!');
+      const artifactId = artifactData?.[0]?.id;
 
-
-    //Temporary code to insert dummy value into sightings DB
-    const { error: sightingError } = await supabase
-    .from('sightings')
-    .insert({
-        artifact_id: artifactId, 
-        common_name: 'Bird Name', 
-        species_name: 'Bird Species', 
-        description: 'Reasoning for chosen classification.'
-    }); 
+      console.log(artifactId);
 
 
-    if(sightingError){
-      console.error("Failed to insert into sightings: ", sightingError)
-    }else{
-      console.log('Sighting inserted successfully. ');
-    }
+      const { data:identifyData, error:identifyError } = await supabase.functions.invoke('test-identify', {
+        body: {"artifact_id":artifactId},
+      }); 
+
+      console.log(identifyData,identifyError)
+
+
+      // //Temporary code to insert dummy value into sightings DB
+      // const { error: sightingError } = await supabase
+      // .from('sightings')
+      // .insert({
+      //     artifact_id: artifactId, 
+      //     common_name: 'Bird Name', 
+      //     species_name: 'Bird Species', 
+      //     description: 'Reasoning for chosen classification.'
+      // }); 
+
+
+      // if(sightingError){
+      //   console.error("Failed to insert into sightings: ", sightingError)
+      // }else{
+      //   console.log('Sighting inserted successfully. ');
+      // }
 
 
 
-    }catch (error) {
+    } catch (error) {
       console.error("Error uploading file:", error);
     }
 

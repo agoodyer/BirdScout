@@ -20,7 +20,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Journal() {
 
-
   const username = auth.currentUser.displayName;
   const [sightings, setSightings] = useState<Sighting[]>([]);
   useEffect(() => { fetchSightings(username).then(setSightings) }, []);
