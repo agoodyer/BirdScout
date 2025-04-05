@@ -1,9 +1,10 @@
-import { StyleSheet, Image, TextInput } from "react-native";
+import { StyleSheet, Image, TextInput, Platform, KeyboardAvoidingView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
 import * as Location from 'expo-location';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
@@ -58,18 +59,6 @@ export default function IdentifyScreen() {
   const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
   const supabase = createClient(supabaseUrl, supabaseKey);
-
-
-
-  // EXPO_PUBLIC_SUPABASE_URL=https://silypxhanlxapseqeqtt.supabase.co
-  // EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4
-
-
-  //secret 97f16bb965ab9c1107898dfcafb56b2988e3dfe75ae4bc2c3e91954224fec4fb
-
-
-
-
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -162,7 +151,8 @@ export default function IdentifyScreen() {
         latitude,
         longitude,
         image_path: imagePath,
-        username
+        username,
+        text_description: {text: inputText}
       }).select();
 
       if (insertError) {
@@ -176,30 +166,11 @@ export default function IdentifyScreen() {
       console.log(artifactId);
 
 
-      const { data:identifyData, error:identifyError } = await supabase.functions.invoke('test-identify', {
-        body: {"artifact_id":artifactId},
-      }); 
+      const { data: identifyData, error: identifyError } = await supabase.functions.invoke('test-identify', {
+        body: { "artifact_id": artifactId },
+      });
 
-      console.log(identifyData,identifyError)
-
-
-      // //Temporary code to insert dummy value into sightings DB
-      // const { error: sightingError } = await supabase
-      // .from('sightings')
-      // .insert({
-      //     artifact_id: artifactId, 
-      //     common_name: 'Bird Name', 
-      //     species_name: 'Bird Species', 
-      //     description: 'Reasoning for chosen classification.'
-      // }); 
-
-
-      // if(sightingError){
-      //   console.error("Failed to insert into sightings: ", sightingError)
-      // }else{
-      //   console.log('Sighting inserted successfully. ');
-      // }
-
+      console.log(identifyData, identifyError)
 
 
     } catch (error) {
@@ -238,7 +209,9 @@ export default function IdentifyScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View  style={styles.container}
+    
+    >
       {/* View toggle button */}
       <TouchableOpacity
         style={{
@@ -255,7 +228,7 @@ export default function IdentifyScreen() {
       </TouchableOpacity>
 
       {showTextInput ? (
-        <View style={styles.textInputContainer}>
+        <KeyboardAwareScrollView contentContainerStyle={styles.textInputContainer}>
           <View style={styles.textCard}>
             <Text style={styles.prompt}>
               Please describe any characteristics of the bird you wish to
@@ -289,7 +262,7 @@ export default function IdentifyScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAwareScrollView>
       ) : !uri ? (
         <CameraView style={styles.camera} facing={facing} ref={ref}>
           <View style={styles.overlay}>
@@ -322,20 +295,44 @@ export default function IdentifyScreen() {
             <MaterialIcons name="delete-forever" size={40} color="red" />
           </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={uploadPhoto}
-              style={{
-                position: "absolute",
-                top: 20,
-                left: 20,
-                zIndex: 10,
-                padding: 5,
-                backgroundColor: "white",
-                borderRadius: 100,
-              }}
-            >
-              <MaterialIcons name="cloud-upload" size={40} color="green" />
-            </TouchableOpacity>
+
+          <View
+    style={{
+      position: "absolute",
+      bottom: Platform.select({
+        ios: 120,
+        android: 80,
+      }),
+      width: "100%",
+      alignItems: "center",
+      zIndex: 10,
+    }}
+  >
+
+          <TouchableOpacity
+            onPress={uploadPhoto}
+            style={{
+              paddingInline: 20,
+              paddingBlock:10,
+              opacity:0.9,
+              backgroundColor: "white",
+              borderRadius: 20,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+
+            <Image
+              source={require("@/assets/ui/identify.png")}
+              style={{ width: 64, height: 64 }}
+              resizeMode="contain"
+            />
+            <Text style={{  color: '#71727A', fontSize: 16, textAlign:'center' }}>Identify </Text>
+          </TouchableOpacity>
+
+          </View>
+
+
           <Image
             source={{ uri: uri }}
             style={{ flex: 1, resizeMode: "contain" }}
@@ -362,7 +359,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     justifyContent: "flex-end",
-    paddingBottom: 80,
+    paddingBottom: Platform.select({
+      ios: 120,
+      android: 80, // or 0 or whatever suits Android
+    }),
   },
   cameraControlsWrapper: {
     alignItems: "center",
@@ -412,7 +412,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 80,
     backgroundColor: "#f8f8f8",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
+    gap:40
   },
   textCard: {
     backgroundColor: "#ffffff",
