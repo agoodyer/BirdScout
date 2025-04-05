@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { JournalEntry } from '@/components/birdscout/JournalEntry';
 
 import { Sighting } from '../types/sighting';
@@ -30,3 +30,9 @@ export default function Journal() {
 
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingBottom: 80,
+  },
+});
