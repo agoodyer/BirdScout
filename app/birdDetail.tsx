@@ -3,19 +3,21 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export default function BirdDetail() {
   const params = useLocalSearchParams();
   const textColor = 'white';
   const secondaryColor = '#bbbbbb';
   const borderColor = '#333333';
+  const color = useThemeColor({}, "text");
 
   return (
     <ScrollView 
       contentContainerStyle={styles.scrollContainer}
-      style={{ backgroundColor: '#121212' }}
+      style={{ backgroundColor: 'white' }}
     >
-      <ThemedView style={[styles.container, { backgroundColor: '#121212' }]}>
+      <ThemedView style={[styles.container]}>
         <Image
           source={{ uri: params.image as string }}
           style={styles.image}
@@ -23,47 +25,46 @@ export default function BirdDetail() {
         
         <View style={styles.detailsContainer}>
           <View style={styles.titleRow}>
-            <ThemedText type="title" style={[styles.commonName, { color: textColor }]}>
+            <ThemedText type="title" style={[styles.commonName]}>
               {params.commonName}
             </ThemedText>
-            {params.foundBy && (
-              <View style={styles.foundByContainer}>
-                <MaterialIcons name="person" size={18} color={textColor} />
-                <ThemedText style={[styles.foundByText, { color: secondaryColor }]}>
-                  Spotted by {params.foundBy}
-                </ThemedText>
-              </View>
-            )}
           </View>
           
-          <ThemedText type="subtitle" style={[styles.speciesName, { color: secondaryColor }]}>
+          <ThemedText type="subtitle" style={[styles.speciesName]}>
             {params.speciesName}
           </ThemedText>
           
           {params.shortDesc && (
-            <ThemedText style={[styles.shortDesc, { color: textColor }]}>
+            <ThemedText style={[styles.shortDesc]}>
               {params.shortDesc}
             </ThemedText>
           )}
 
           <View style={styles.infoContainer}>
             <View style={styles.detailRow}>
-              <MaterialIcons name="calendar-month" size={20} color={textColor} />
-              <ThemedText style={[styles.detailText, { color: textColor }]}>{params.date}</ThemedText>
+              <MaterialIcons name="calendar-month" size={20} color={color} />
+              <ThemedText style={[styles.detailText]}>{params.date}</ThemedText>
             </View>
+
+            <View style={styles.detailRow}>
+                <MaterialIcons name="person" size={20} color={color} />
+                <ThemedText style={[styles.detailText]}>
+                  Spotted by {params.foundBy}
+                </ThemedText>
+              </View>
 
             {params.location && (
               <View style={styles.detailRow}>
-                <MaterialIcons name="location-on" size={20} color={textColor} />
-                <ThemedText style={[styles.detailText, { color: textColor }]}>{params.location}</ThemedText>
+                <MaterialIcons name="location-on" size={20} color={color} />
+                <ThemedText style={[styles.detailText]}>{params.location}</ThemedText>
               </View>
             )}
           </View>
 
           {params.longDesc && (
             <View style={[styles.sectionContainer, { borderTopColor: borderColor }]}>
-              <ThemedText style={[styles.sectionTitle, { color: textColor }]}>Description</ThemedText>
-              <ThemedText style={[styles.longDescText, { color: secondaryColor }]}>
+              <ThemedText style={[styles.sectionTitle]}>Description</ThemedText>
+              <ThemedText style={[styles.longDescText]}>
                 {params.longDesc}
               </ThemedText>
             </View>
@@ -71,8 +72,8 @@ export default function BirdDetail() {
 
           {params.notes && (
             <View style={[styles.sectionContainer, { borderTopColor: borderColor }]}>
-              <ThemedText style={[styles.sectionTitle, { color: textColor }]}>Observation Notes</ThemedText>
-              <ThemedText style={[styles.notesText, { color: secondaryColor }]}>
+              <ThemedText style={[styles.sectionTitle]}>Observation Notes</ThemedText>
+              <ThemedText style={[styles.notesText]}>
                 {params.notes}
               </ThemedText>
             </View>
@@ -86,6 +87,8 @@ export default function BirdDetail() {
 const styles = StyleSheet.create({
   scrollContainer: {
     paddingBottom: 40,
+    paddingTop:100, 
+
   },
   container: {
     flex: 1,
@@ -123,7 +126,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   infoContainer: {
-    backgroundColor: '#1e1e1e',
+    backgroundColor: 'rgba(211, 211, 211, 0.2)',
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
