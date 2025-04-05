@@ -1,7 +1,7 @@
-import { StyleSheet, TouchableOpacity, View, Text, Image } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
-import { Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { ThemedView } from "../ThemedView";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Sighting } from "@/app/types/sighting";
@@ -13,17 +13,9 @@ export function JournalEntry({
 }) {
   const color = useThemeColor({}, "text");
   return (
-    <ThemedView
-      style={{ borderBottomWidth: 2, borderColor: "#D3D3D3", padding: 10 }}
-    >
-      <TouchableOpacity>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
+    <ThemedView style={[styles.container, { backgroundColor: '#121212' }]}>
+      <TouchableOpacity onPress={handlePress}>
+        <View style={styles.entryContainer}>
           <Image
             source={typeof sighting.artifact.imageUrl === "string" ? { uri: sighting.artifact.imageUrl } : sighting.artifact.imageUrl}
             style={{ width: 100, height: 100, borderRadius: 10 }}
@@ -40,12 +32,11 @@ export function JournalEntry({
               <ThemedText>{sighting.artifact.date}</ThemedText>
             </View>
           </View>
-
           <Octicons
             name="chevron-right"
             size={24}
-            color={color}
-            style={{ paddingRight: 10 }}
+            color={textColor}
+            style={styles.chevron}
           />
         </View>
       </TouchableOpacity>
@@ -54,11 +45,54 @@ export function JournalEntry({
 }
 
 const styles = StyleSheet.create({
-  optionContainer: {
+  container: {
+    borderBottomWidth: 1,
+    borderColor: "#333333",
+    padding: 15
+  },
+  entryContainer: {
     flexDirection: "row",
-    gap: 8,
-    justifyContent: "space-between",
-    padding: 20,
-    paddingInline: 40,
+    alignItems: "center",
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  textContainer: {
+    paddingHorizontal: 15,
+    flex: 1,
+  },
+  commonName: {
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  speciesName: {
+    fontStyle: "italic",
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  shortDesc: {
+    fontSize: 13,
+    marginBottom: 6,
+  },
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  dateText: {
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  foundByText: {
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  iconSpacer: {
+    marginLeft: 10,
+  },
+  chevron: {
+    paddingRight: 5,
   },
 });
