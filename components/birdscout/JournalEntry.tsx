@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import { ThemedView } from "../ThemedView";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Sighting } from "@/app/types/sighting";
@@ -11,10 +11,30 @@ export function JournalEntry({
 }: {
   sighting: Sighting
 }) {
+
+  const handlePress = () => {
+    router.push({
+      pathname: "/birdDetail",
+      params: {
+        id:sighting.id,
+        image: typeof sighting.artifact.imageUrl === "string" ? sighting.artifact.imageUrl : "",
+        commonName:sighting.commonName,
+        speciesName:sighting.speciesName,
+        date:sighting.artifact.date,
+        location: sighting.artifact.location.latitude.toString() + ", " +  sighting.artifact.location.latitude.toString() ,
+        notes:"We need to add notes to the database if we want info here.",
+        shortDesc:"We need to add description to the database if we want info here.",
+        longDesc:"We need to add description to the database if we want info here.",
+        foundBy:sighting.artifact.username
+      },
+    });
+  };
+
+
   const color = useThemeColor({}, "text");
   return (
-    <ThemedView style={[styles.container, { backgroundColor: '#121212' }]}>
-      <TouchableOpacity onPress={handlePress}>
+    <ThemedView style={[styles.container]}>
+      <TouchableOpacity onPress={handlePress} >
         <View style={styles.entryContainer}>
           <Image
             source={typeof sighting.artifact.imageUrl === "string" ? { uri: sighting.artifact.imageUrl } : sighting.artifact.imageUrl}
@@ -35,7 +55,7 @@ export function JournalEntry({
           <Octicons
             name="chevron-right"
             size={24}
-            color={textColor}
+            color={color}
             style={styles.chevron}
           />
         </View>
@@ -46,8 +66,8 @@ export function JournalEntry({
 
 const styles = StyleSheet.create({
   container: {
-    borderBottomWidth: 1,
-    borderColor: "#333333",
+    borderBottomWidth: 2,
+    borderColor: "#D3D3D3",
     padding: 15
   },
   entryContainer: {
