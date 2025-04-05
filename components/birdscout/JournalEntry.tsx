@@ -4,17 +4,12 @@ import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { ThemedView } from "../ThemedView";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { Sighting } from "@/app/types/sighting";
 
 export function JournalEntry({
-  image,
-  commonName,
-  speciesName,
-  date,
+  sighting
 }: {
-  image: string | number;
-  commonName: string;
-  speciesName: string;
-  date: string;
+  sighting: Sighting
 }) {
   const color = useThemeColor({}, "text");
   return (
@@ -30,19 +25,19 @@ export function JournalEntry({
           }}
         >
           <Image
-            source={typeof image === "string" ? { uri: image } : image}
+            source={typeof sighting.artifact.imageUrl === "string" ? { uri: sighting.artifact.imageUrl } : sighting.artifact.imageUrl}
             style={{ width: 100, height: 100, borderRadius: 10 }}
           />
 
           <View style={{ paddingInline: 30 }}>
             <ThemedText style={{ fontWeight: "bold", fontSize: 20 }}>
-              {commonName}
+              {sighting.commonName}
             </ThemedText>
-            <ThemedText style={{}}>{speciesName}</ThemedText>
+            <ThemedText style={{}}>{sighting.speciesName}</ThemedText>
 
             <View style={{ flexDirection: "row", gap: 4 }}>
               <MaterialIcons name="calendar-month" size={24} color={color} />
-              <ThemedText>{date}</ThemedText>
+              <ThemedText>{sighting.artifact.date}</ThemedText>
             </View>
           </View>
 
