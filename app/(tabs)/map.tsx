@@ -1,11 +1,7 @@
-import { StyleSheet, Image, Platform, View, Alert, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Image, Platform, View,Text} from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+
 
 
 import MapView, { Callout, Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE, MapTypes } from 'react-native-maps';
@@ -14,10 +10,14 @@ import { useEffect, useRef, useState } from 'react';
 import { LocationObjectCoords } from 'expo-location';
 
 
-import { markers } from '../../assets/markers';
+
+import { Sighting } from '../types/sighting';
+
 import LottieView from 'lottie-react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
+import { fetchSightings } from '@/api/fetchSightings';
+
 
 export default function TabTwoScreen() {
   const [hasPermission, setHasPermission] = useState(false);
@@ -28,6 +28,10 @@ export default function TabTwoScreen() {
 
   const mapRef = useRef<any>();
   const animation = useRef<LottieView>(null);
+
+    const [sightings, setSightings] = useState<Sighting[]>([]);
+    useEffect(() => { fetchSightings().then(setSightings) }, []);
+
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -109,20 +113,14 @@ export default function TabTwoScreen() {
         mapType={mapType}
         ref={mapRef}
       >
-        {markers.map((marker, index) => (
-          <Marker 
-            key={index} 
-            coordinate={marker}
-            title={marker.title}
+        {sightings.map((sighting, index) => (
+          <Marker key={index} coordinate={sighting.artifact.location}
+            style={{ opacity: 0 }}
+            icon={require('../../assets/images/icon.png')}
             pinColor='#00BDFF'
           >
-            <Callout tooltip>
-              <MapSighting 
-                commonName={marker.title} 
-                speciesName="Aves" 
-                date="April 1, 2024" 
-                image="aaa"
-              />
+            <Callout>
+              <MapSighting sighting={sighting}></MapSighting>
             </Callout>
           </Marker>
         ))}
@@ -152,22 +150,29 @@ export default function TabTwoScreen() {
   );
 }
 
-const MapSighting = ({ commonName, speciesName, image, date }: { commonName: string; speciesName: string; image: string, date: string }) => {
-  const router = useRouter();
-  
-  return (
-    <View style={styles.calloutContainer}>
-      <Image
-        source={require('@/assets/images/canada_goose.jpeg')}
-        style={styles.calloutImage}
-      />
-      <Text style={styles.calloutTitle}>{commonName}</Text>
-      <Text style={styles.calloutSubtitle}>{speciesName}</Text>
+const MapSighting = ({ sighting }: { sighting:Sighting }) => {
 
-      <View style={styles.calloutDateContainer}>
-        <MaterialIcons name="calendar-month" size={18} color={'#666'} />
-        <Text style={styles.calloutDate}>{date}</Text>
-      </View>
+  return (
+  
+  <View style={{ height:200, justifyContent:'center', gap:4 }}>
+    <Image
+      source={{uri:sighting.artifact.imageUrl}}
+      style={{ width: 200, height: 100, borderRadius: 10 }}
+
+    />
+    <Text style={{ fontWeight: 'bold', width:'100%' }}>{sighting.commonName}</Text>
+    <Text style={{  width:'100%' }}>{sighting.speciesName}</Text>
+
+    <View style={{ flexDirection: 'row', gap: 4, alignItems:'center'}}>
+      <MaterialIcons name="calendar-month" size={24} color={'black'} />
+      <Text>{sighting.artifact.date}</Text>
+    </View>
+
+    <View style={{ flexDirection: 'row', gap: 4, alignItems:'center'}}>
+      <MaterialIcons name="person" size={24} color={'black'} />
+      <Text>{sighting.artifact.username}</Text>
+    </View>
+
     </View>
   );
 }

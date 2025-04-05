@@ -1,20 +1,36 @@
 import { StyleSheet, ScrollView } from 'react-native';
 import { JournalEntry } from '@/components/birdscout/JournalEntry';
 
+import { Sighting } from '../types/sighting';
+import { Artifact } from '../types/artifact';
+
+import { fetchSightings } from '@/api/fetchSightings';
+
+import { auth, db } from "../../store/firebaseConfig";
+
+
+import { useEffect, useState } from 'react';
+
+import { createClient } from '@supabase/supabase-js';
+import { sightings } from '@/assets/sightings';
+const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+
 export default function Journal() {
 
+  const username = auth.currentUser.displayName;
+  const [sightings, setSightings] = useState<Sighting[]>([]);
+  useEffect(() => { fetchSightings(username).then(setSightings) }, []);
 
   return (
-    
+
     <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
-      <JournalEntry image="https://www.ndow.org/wp-content/uploads/2021/10/branta_canadensis-scaled.jpeg" commonName='Canada Goose' speciesName="Branta Canadensis" date="April 22, 2025"/>
-      <JournalEntry image="https://www.allaboutbirds.org/guide/assets/photo/304463771-480px.jpg" commonName='Pelican' speciesName="Pelecanus" date="March 6, 2025"/>
-      <JournalEntry image="https://t0.gstatic.com/licensed-image?q=tbn:ANd9GcS8FU-beI6zELEKha3GDRAR47ge2mekDCU2LOpYkonMMCwFsFlgxZmfy--ppogKECzdjy9XNHx0zrztUmUf" commonName='Homing Pigeon' speciesName="Columba livia domestica" date="March 1, 2025"/>
-      <JournalEntry image="https://www.shutterstock.com/shutterstock/videos/3674524103/thumb/1.jpg?ip=x480" commonName='Blue Jay' speciesName="Cyanocitta cristata" date="February 18, 2025"/>
-      <JournalEntry image="https://inaturalist-open-data.s3.amazonaws.com/photos/97752362/original.jpg" commonName='Crow' speciesName="Corvus Albus" date="February 10, 2025"/>
-      <JournalEntry image="https://upload.wikimedia.org/wikipedia/commons/b/bf/Anas_platyrhynchos_male_female_quadrat.jpg" commonName='Mallard Duck' speciesName="Anas Platyrhynchos" date="February 1, 2025"/>
-    
+      {sightings.map((sighting, index) => (
+        <JournalEntry key={index} sighting={sighting} />
+      ))}
     </ScrollView>
-      
+
   );
 }
