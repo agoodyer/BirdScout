@@ -55,4 +55,29 @@ import { Sighting } from "@/app/types/sighting";
     username: "anonymous user"
     }),
 
+    new Sighting('6', 'American Robin', 'Turdus migratorius', {
+      id: "6",
+      location: { latitude: 40.748817, longitude: -73.985428 },  // School Grounds
+      date: "November 5, 2024",
+      imageUrl: "https://cdn.download.ams.birds.cornell.edu/api/v1/asset/297896501/1200",
+      username: "Emily Davis"
+    }),
+
+    new Sighting('7', 'Bald Eagle', 'Haliaeetus leucocephalus', {
+      id: "7",
+      location: { latitude: 42.9634, longitude: -87.5862 },  // Lake Michigan Shoreline
+      date: "October 12, 2024",
+      imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Bald_eagle_about_to_fly_in_Alaska_%282016%29.jpg/1200px-Bald_eagle_about_to_fly_in_Alaska_%282016%29.jpg",
+      username: "David Wilson"
+    }),
+
+    new Sighting('8', 'Great Horned Owl', 'Bubo virginianus', {
+      id: "8",
+      location: { latitude: 41.7013, longitude: -88.2751 },  // Forest Edge
+      date: "September 28, 2024",
+      imageUrl: "https://cdn.download.ams.birds.cornell.edu/api/v1/asset/60390101/1200",
+      username: "Olivia Martinez"
+    }),
+  
+
   ]
