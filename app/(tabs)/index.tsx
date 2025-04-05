@@ -1,31 +1,38 @@
-import { StyleSheet, Image, TextInput, Platform, KeyboardAvoidingView } from "react-native";
+import {
+  StyleSheet,
+  Image,
+  TextInput,
+  Platform,
+  KeyboardAvoidingView,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
 import { Button, Text, TouchableOpacity, View } from "react-native";
-
 
 import { auth, db } from "../../store/firebaseConfig";
 
 import { createClient } from "@supabase/supabase-js";
 import * as FileSystem from "expo-file-system";
 
-
 const useLocation = () => {
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
       // Request permission
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
         return;
       }
 
@@ -38,13 +45,8 @@ const useLocation = () => {
   return location;
 };
 
-
-
-
 export default function IdentifyScreen() {
-
   const location = useLocation();
-
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
@@ -57,13 +59,14 @@ export default function IdentifyScreen() {
 
   // Initialize Supabase client
   const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
+  const supabaseKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images', 'videos'],
+      mediaTypes: ["images", "videos"],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 0.1,
@@ -76,7 +79,6 @@ export default function IdentifyScreen() {
     }
   };
 
-
   const takePicture = async () => {
     const photo = await ref.current?.takePictureAsync();
     setUri(photo?.uri);
@@ -86,7 +88,6 @@ export default function IdentifyScreen() {
   const discardPicture = () => {
     setUri(undefined);
   };
-
 
   const base64ToArrayBuffer = (base64: string) => {
     const binaryString = atob(base64);
@@ -101,37 +102,35 @@ export default function IdentifyScreen() {
     return arrayBuffer;
   };
 
-
   const uploadPhoto = async () => {
-
     if (!uri) return;
 
     try {
       const fileUri = uri;
-      const fileName = fileUri.split('/').pop()!;
-      // const fileType = mime.getType(fileUri); 
+      const fileName = fileUri.split("/").pop()!;
+      // const fileType = mime.getType(fileUri);
 
       const response = await fetch(uri);
 
       if (!response.ok) {
-        console.error('Failed to fetch image:', response.statusText);
+        console.error("Failed to fetch image:", response.statusText);
         return;
       }
-
 
       const base64 = await FileSystem.readAsStringAsync(fileUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-
       const arrayBuffer = base64ToArrayBuffer(base64);
 
       const filePath = `${fileName}`;
 
-      const { data, error } = await supabase.storage.from("birds").upload(filePath, arrayBuffer, {
-        upsert: true,
-        contentType: 'image/jpeg',
-      });
+      const { data, error } = await supabase.storage
+        .from("birds")
+        .upload(filePath, arrayBuffer, {
+          upsert: true,
+          contentType: "image/jpeg",
+        });
 
       if (error) {
         console.log(error);
@@ -140,45 +139,41 @@ export default function IdentifyScreen() {
 
       const imagePath = data.path;
 
-      const latitude = location.latitude
-      const longitude = location.longitude
+      const latitude = location.latitude;
+      const longitude = location.longitude;
 
-      const username = auth.currentUser?.displayName || 'anonymous';
+      const username = auth.currentUser?.displayName || "anonymous";
 
-
-
-      const { data: artifactData, error: insertError } = await supabase.from('artifacts').insert({
-        latitude,
-        longitude,
-        image_path: imagePath,
-        username,
-        text_description: {text: inputText}
-      }).select();
+      const { data: artifactData, error: insertError } = await supabase
+        .from("artifacts")
+        .insert({
+          latitude,
+          longitude,
+          image_path: imagePath,
+          username,
+          text_description: { text: inputText },
+        })
+        .select();
 
       if (insertError) {
-        console.error('Failed to insert artifact data:', insertError);
+        console.error("Failed to insert artifact data:", insertError);
         return;
       }
 
-      console.log('Artifact data inserted successfully!');
+      console.log("Artifact data inserted successfully!");
       const artifactId = artifactData?.[0]?.id;
 
       console.log(artifactId);
 
+      const { data: identifyData, error: identifyError } =
+        await supabase.functions.invoke("test-identify", {
+          body: { artifact_id: artifactId },
+        });
 
-      const { data: identifyData, error: identifyError } = await supabase.functions.invoke('test-identify', {
-        body: { "artifact_id": artifactId },
-      });
-
-      console.log(identifyData, identifyError)
-
-
+      console.log(identifyData, identifyError);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
-
-
-
   };
 
   const toggleCameraFacing = () => {
@@ -209,9 +204,7 @@ export default function IdentifyScreen() {
   }
 
   return (
-    <View  style={styles.container}
-    
-    >
+    <View style={styles.container}>
       {/* View toggle button */}
       <TouchableOpacity
         style={{
@@ -228,7 +221,9 @@ export default function IdentifyScreen() {
       </TouchableOpacity>
 
       {showTextInput ? (
-        <KeyboardAwareScrollView contentContainerStyle={styles.textInputContainer}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.textInputContainer}
+        >
           <View style={styles.textCard}>
             <Text style={styles.prompt}>
               Please describe any characteristics of the bird you wish to
@@ -295,43 +290,42 @@ export default function IdentifyScreen() {
             <MaterialIcons name="delete-forever" size={40} color="red" />
           </TouchableOpacity>
 
-
           <View
-    style={{
-      position: "absolute",
-      bottom: Platform.select({
-        ios: 120,
-        android: 80,
-      }),
-      width: "100%",
-      alignItems: "center",
-      zIndex: 10,
-    }}
-  >
-
-          <TouchableOpacity
-            onPress={uploadPhoto}
             style={{
-              paddingInline: 20,
-              paddingBlock:10,
-              opacity:0.9,
-              backgroundColor: "white",
-              borderRadius: 20,
-              justifyContent: "center",
+              position: "absolute",
+              bottom: Platform.select({
+                ios: 120,
+                android: 80,
+              }),
+              width: "100%",
               alignItems: "center",
+              zIndex: 10,
             }}
           >
-
-            <Image
-              source={require("@/assets/ui/identify.png")}
-              style={{ width: 64, height: 64 }}
-              resizeMode="contain"
-            />
-            <Text style={{  color: '#71727A', fontSize: 16, textAlign:'center' }}>Identify </Text>
-          </TouchableOpacity>
-
+            <TouchableOpacity
+              onPress={uploadPhoto}
+              style={{
+                paddingInline: 20,
+                paddingBlock: 10,
+                opacity: 0.9,
+                backgroundColor: "white",
+                borderRadius: 20,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("@/assets/ui/identify.png")}
+                style={{ width: 64, height: 64 }}
+                resizeMode="contain"
+              />
+              <Text
+                style={{ color: "#71727A", fontSize: 16, textAlign: "center" }}
+              >
+                Identify{" "}
+              </Text>
+            </TouchableOpacity>
           </View>
-
 
           <Image
             source={{ uri: uri }}
@@ -413,7 +407,7 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     backgroundColor: "#f8f8f8",
     // justifyContent: "space-between",
-    gap:40
+    gap: 40,
   },
   textCard: {
     backgroundColor: "#ffffff",
