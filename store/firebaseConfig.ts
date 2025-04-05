@@ -16,7 +16,7 @@ export const db = getFirestore(app);
 
 async function testFirestore() {
   try {
-    const querySnapshot = await getDocs(collection(db, "users")); // Change to an actual collection in your DB
+    const querySnapshot = await getDocs(collection(db, "users"));
     console.log(
       "Firestore is connected! Documents:",
       querySnapshot.docs.map((doc) => doc.data())

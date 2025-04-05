@@ -24,11 +24,13 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { SettingsButton } from "@/components/birdscout/SettingsButton";
 import { useState, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { auth } from "../store/firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
+import { auth } from "@/store/firebaseConfig";
+
 export default function Account() {
   const router = useRouter();
+  const user = auth.currentUser;
   const [isPremium, setIsPremium] = useState(false);
 
   useFocusEffect(
@@ -40,11 +42,11 @@ export default function Account() {
         const status = await AsyncStorage.getItem("isPremium");
         setIsPremium(status === "true");
       };
-  
+
       checkPremiumAndReload();
     }, [])
-  );  
-  
+  );
+
   return (
     <>
       <ThemedView style={styles.titleContainer}>
@@ -62,10 +64,19 @@ export default function Account() {
             style={{ width: 120, height: 120, borderRadius: 100 }}
             resizeMode="contain"
           />
-          <ThemedText type="subtitle"> {auth.currentUser?.displayName} </ThemedText>
+          <ThemedText type="subtitle">
+            {" "}
+            {auth.currentUser?.displayName}{" "}
+          </ThemedText>
           <ThemedText type="default"> {auth.currentUser?.email} </ThemedText>
 
-          {isPremium && (<ThemedText style={{ color: "#FFD700", fontWeight: "bold" }}> Premium </ThemedText>)}
+          {isPremium && (
+            <ThemedText style={{ color: "#FFD700", fontWeight: "bold" }}>
+              {" "}
+              Premium{" "}
+            </ThemedText>
+          )}
+          <ThemedText type="default">@{user.displayName}</ThemedText>
         </ThemedView>
 
         <SettingsButton text={"Payment Information"} route={"/payment"} />
