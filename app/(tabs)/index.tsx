@@ -13,7 +13,6 @@ import { Button, Text, TouchableOpacity, View } from "react-native";
 import { auth, db } from "../../store/firebaseConfig";
 
 import { createClient } from "@supabase/supabase-js";
-import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 
 

@@ -1,4 +1,4 @@
-import { StyleSheet, Image, Platform, View,Text} from 'react-native';
+import { StyleSheet, Image, Platform, View,Text, TouchableOpacity} from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 

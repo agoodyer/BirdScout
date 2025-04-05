@@ -22,7 +22,8 @@ export default function Journal() {
 
   const username = auth.currentUser.displayName;
   const [sightings, setSightings] = useState<Sighting[]>([]);
-  useEffect(() => { fetchSightings(username).then(setSightings) }, []);
+  //ONCE WE FINALIZE EVERYTHING, pass fetchSightings(username) to get journal entries for a specific user. 
+  useEffect(() => { fetchSightings().then(setSightings) }, []);
 
   return (
 
