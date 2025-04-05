@@ -76,7 +76,7 @@ export const fetchSightings = async(username: string | null = null) =>{
   }); 
 
 
-  console.log(databaseSightings)
+  // console.log(databaseSightings)
 
   // const baseUrl = "https://<your-project-ref>.supabase.co/storage/v1/object/public/<bucket-name>/";
   // const fullUrl = `${baseUrl}${imagePath}`;
