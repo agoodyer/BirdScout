@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // either fetch all sigtings for a username, or return ALL sightings
 export const fetchSightings = async(username: string | null = null) =>{
 
-  console.log('fetching sightings!');
+  //console.log('fetching sightings!');
 
   let query = supabase.from('sightings').select(
 `
@@ -76,7 +76,7 @@ export const fetchSightings = async(username: string | null = null) =>{
   }); 
 
 
-  console.log(databaseSightings)
+  //console.log(databaseSightings)
 
   // const baseUrl = "https://<your-project-ref>.supabase.co/storage/v1/object/public/<bucket-name>/";
   // const fullUrl = `${baseUrl}${imagePath}`;
