@@ -4,36 +4,74 @@ import { ThemedView } from "@/components/ThemedView";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useEffect, useState } from "react";
 
 export default function BirdDetail() {
   const params = useLocalSearchParams();
-  const textColor = 'white';
-  const secondaryColor = '#bbbbbb';
-  const borderColor = '#333333';
+  const textColor = "white";
+  const secondaryColor = "#bbbbbb";
+  const borderColor = "#333333";
   const color = useThemeColor({}, "text");
 
+  const [location, setLocation] = useState<string>("");
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const loc = await getLocation();
+      setLocation(loc);
+    };
+    fetchLocation();
+  });
+
+  async function getLocation() {
+    let location = "";
+    if (params.location) {
+      const [latitude, longitude] = (params.location as string).split(", ");
+      await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=en`
+      )
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Failed to fetch location data");
+          }
+        })
+        .then((data) => {
+          // location = data.display_name; // Uncomment this line to get the full location name
+          location =
+            data.address.city ||
+            data.address.town ||
+            data.address.village ||
+            "";
+          location = location + (location && ", ") + data.address.country;
+        })
+        .catch((error) => {
+          location = "Location not available";
+        });
+    }
+    return location;
+  }
+
   return (
-    <ScrollView 
+    <ScrollView
       contentContainerStyle={styles.scrollContainer}
-      style={{ backgroundColor: 'white' }}
+      style={{ backgroundColor: "white" }}
     >
       <ThemedView style={[styles.container]}>
-        <Image
-          source={{ uri: params.image as string }}
-          style={styles.image}
-        />
-        
+        <Image source={{ uri: params.image as string }} style={styles.image} />
+
         <View style={styles.detailsContainer}>
           <View style={styles.titleRow}>
             <ThemedText type="title" style={[styles.commonName]}>
               {params.commonName}
             </ThemedText>
           </View>
-          
+
           <ThemedText type="subtitle" style={[styles.speciesName]}>
             {params.speciesName}
           </ThemedText>
-          
+
           {params.shortDesc && (
             <ThemedText style={[styles.shortDesc]}>
               {params.shortDesc}
@@ -47,22 +85,24 @@ export default function BirdDetail() {
             </View>
 
             <View style={styles.detailRow}>
-                <MaterialIcons name="person" size={20} color={color} />
-                <ThemedText style={[styles.detailText]}>
-                  Spotted by {params.foundBy}
-                </ThemedText>
-              </View>
+              <MaterialIcons name="person" size={20} color={color} />
+              <ThemedText style={[styles.detailText]}>
+                Spotted by {params.foundBy}
+              </ThemedText>
+            </View>
 
             {params.location && (
               <View style={styles.detailRow}>
                 <MaterialIcons name="location-on" size={20} color={color} />
-                <ThemedText style={[styles.detailText]}>{params.location}</ThemedText>
+                <ThemedText style={[styles.detailText]}>{location}</ThemedText>
               </View>
             )}
           </View>
 
           {params.longDesc && (
-            <View style={[styles.sectionContainer, { borderTopColor: borderColor }]}>
+            <View
+              style={[styles.sectionContainer, { borderTopColor: borderColor }]}
+            >
               <ThemedText style={[styles.sectionTitle]}>Description</ThemedText>
               <ThemedText style={[styles.longDescText]}>
                 {params.longDesc}
@@ -71,11 +111,13 @@ export default function BirdDetail() {
           )}
 
           {params.notes && (
-            <View style={[styles.sectionContainer, { borderTopColor: borderColor }]}>
-              <ThemedText style={[styles.sectionTitle]}>Observation Notes</ThemedText>
-              <ThemedText style={[styles.notesText]}>
-                {params.notes}
+            <View
+              style={[styles.sectionContainer, { borderTopColor: borderColor }]}
+            >
+              <ThemedText style={[styles.sectionTitle]}>
+                Observation Notes
               </ThemedText>
+              <ThemedText style={[styles.notesText]}>{params.notes}</ThemedText>
             </View>
           )}
         </View>
@@ -87,15 +129,14 @@ export default function BirdDetail() {
 const styles = StyleSheet.create({
   scrollContainer: {
     paddingBottom: 40,
-    paddingTop:100, 
-
+    paddingTop: 100,
   },
   container: {
     flex: 1,
     padding: 20,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 300,
     borderRadius: 10,
     marginBottom: 20,
@@ -104,11 +145,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 5,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   commonName: {
     fontSize: 28,
@@ -116,7 +157,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   speciesName: {
-    fontStyle: 'italic',
+    fontStyle: "italic",
     fontSize: 18,
     marginBottom: 15,
   },
@@ -126,15 +167,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   infoContainer: {
-    backgroundColor: 'rgba(211, 211, 211, 0.2)',
+    backgroundColor: "rgba(211, 211, 211, 0.2)",
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
   },
   detailRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 10,
   },
   detailText: {
@@ -142,8 +183,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   foundByContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 5,
     marginTop: 5,
   },
@@ -156,7 +197,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   sectionTitle: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 20,
     marginBottom: 12,
   },
@@ -167,6 +208,6 @@ const styles = StyleSheet.create({
   notesText: {
     fontSize: 16,
     lineHeight: 24,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
 });
