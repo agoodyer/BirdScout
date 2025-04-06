@@ -42,7 +42,8 @@ export default function Login({ setIsLoggedIn }: any) {
         />
       </View>
 
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Welcome!</Text>
+      <Text style={styles.subtitle}>Sign in to your account</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -61,15 +62,14 @@ export default function Login({ setIsLoggedIn }: any) {
         secureTextEntry
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => router.navigate("/register")}
-        style={styles.linkContainer}
-      >
-        <Text style={styles.linkText}>Don't have an account? Register</Text>
-      </TouchableOpacity>      
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Sign in</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.buttonSignUp} onPress={() => router.navigate("/register")}>
+          <Text style={styles.buttonTextSignUp}>Sign Up</Text>
+      </TouchableOpacity> 
+      </View>     
     </KeyboardAvoidingView>
   );
 }
@@ -79,22 +79,27 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "white",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#333",
+    color: "#00BDFF",
     marginBottom: 10,
+  },
+  subtitle:{
+    fontSize: 20,
+    color: "#333",
+    marginBottom: 30,
   },
   input: {
     width: "100%",
-    padding: 15,
+    padding: 12,
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 10,
-    backgroundColor: "#FFF",
+    borderColor: '#00BDFF',
+    backgroundColor: 'white',
     fontSize: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -103,12 +108,30 @@ const styles = StyleSheet.create({
     elevation: 2, // Android shadow
   },
   button: {
-    width: "100%",
-    padding: 15,
-    backgroundColor: "#007BFF",
+    width: "47%",
+    padding: 12,
+    backgroundColor: "#00BDFF",
     alignItems: "center",
     borderRadius: 10,
+    borderWidth: 2,
+    borderColor:'#00BDFF',
     marginVertical: 10,
+    marginHorizontal:10,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  buttonSignUp: {
+    width: "47%",
+    padding: 12,
+    backgroundColor: "white",
+    alignItems: "center",
+    borderRadius: 10,
+    borderColor: '#00BDFF',
+    borderWidth: 2,
+    marginVertical: 10,
+    marginHorizontal:10,
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -119,11 +142,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  buttonTextSignUp: {
+    color: '#00BDFF',
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   linkContainer: {
     marginTop: 10,
   },
   linkText: {
-    color: "#007BFF",
+    color: "#00BDFF",
     fontSize: 16,
     fontWeight: "bold",
   },
