@@ -52,11 +52,11 @@ export default function Register() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <Text style={styles.title}>Register</Text>
+          style={styles.container}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.subtitle}>Create your account!</Text>
       <TextInput
         placeholder="Email"
         value={email}
@@ -89,7 +89,7 @@ export default function Register() {
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <TouchableOpacity onPress={handleRegister} style={styles.button}>
-        <Text style={styles.buttonText}>Register</Text>
+        <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.back()}>
         <Text style={styles.linkText}>Already have an account? Login</Text>
@@ -123,31 +123,44 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "white",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
+    color: "#00BDFF",
+    marginBottom: 10,
+  },
+  subtitle:{
+    fontSize: 20,
     color: "#333",
-    marginBottom: 20,
+    marginBottom: 30,
   },
   input: {
     width: "100%",
-    padding: 15,
+    padding: 12,
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 10,
-    backgroundColor: "#FFF",
+    borderColor: '#00BDFF',
+    backgroundColor: 'white',
     fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2, // Android shadow
   },
   button: {
     width: "100%",
-    padding: 15,
-    backgroundColor: "#007BFF",
+    padding: 12,
+    backgroundColor: "#00BDFF",
     alignItems: "center",
     borderRadius: 10,
+    borderWidth: 2,
+    borderColor:'#00BDFF',
     marginVertical: 10,
+    marginHorizontal:10,
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -162,7 +175,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   linkText: {
-    color: "#007BFF",
+    color: "#00BDFF",
     fontSize: 16,
     fontWeight: "bold",
   },
