@@ -10,6 +10,8 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import IdentifyIcon from '../../assets/ui/identifyIcon';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -305,24 +307,21 @@ export default function IdentifyScreen() {
             <TouchableOpacity
               onPress={uploadPhoto}
               style={{
-                paddingInline: 20,
+                paddingInline: 30,
                 paddingBlock: 10,
                 opacity: 0.9,
                 backgroundColor: "white",
-                borderRadius: 20,
+                borderRadius: 200,
                 justifyContent: "center",
                 alignItems: "center",
+                gap:5
               }}
             >
-              <Image
-                source={require("@/assets/ui/identify.png")}
-                style={{ width: 64, height: 64 }}
-                resizeMode="contain"
-              />
+             <IdentifyIcon width={40} height={28} fill="#006FFD"  />
               <Text
                 style={{ color: "#71727A", fontSize: 16, textAlign: "center" }}
               >
-                Identify{" "}
+                Identify
               </Text>
             </TouchableOpacity>
           </View>
