@@ -9,7 +9,7 @@ import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import { LocationObjectCoords } from 'expo-location';
 
-
+import * as Linking from 'expo-linking';
 
 import { Sighting } from '../types/sighting';
 
@@ -150,6 +150,13 @@ export default function TabTwoScreen() {
   );
 }
 
+const getDirections = (sighting) => {
+  const artifactCoord = sighting.artifact.location;
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${artifactCoord.latitude},${artifactCoord.longitude}`;
+  Linking.openURL(url);
+}
+
+
 const MapSighting = ({ sighting }: { sighting:Sighting }) => {
 
   return (
@@ -173,7 +180,16 @@ const MapSighting = ({ sighting }: { sighting:Sighting }) => {
       <Text>{sighting.artifact.username}</Text>
     </View>
 
+    <View>
+      <Callout onPress={() => getDirections(sighting)}>
+        <View style={{backgroundColor: '#00BDFF', alignItems: 'center', borderRadius: 20, padding: 6, marginTop: 58, marginLeft: 108, flexDirection:'row'}}>
+          <Image source={require('../../assets/images/navigationIcon.png')} style={{width: 22, height: 22, marginRight:3}}/>
+          <Text style={{ color: 'white', fontWeight:"bold"}}>Follow</Text>
+        </View>
+      </Callout>
     </View>
+
+  </View>
   );
 }
 
