@@ -154,8 +154,8 @@ const MapSighting = ({ sighting }: { sighting:Sighting }) => {
 
     <View>
       <Callout onPress={() => getDirections(sighting)}>
-        <View style={{backgroundColor: '#00BDFF', alignItems: 'center', borderRadius: 20, padding: 6, marginTop: 58, marginLeft: 107, flexDirection:'row'}}>
-          <Image source={require('../../assets/images/navigationIcon.png')} style={{width: 22, height: 22, marginRight:4}}/>
+        <View style={{backgroundColor: '#00BDFF', alignItems: 'center', borderRadius: 20, padding: 6, marginTop: 58, marginLeft: 108, flexDirection:'row'}}>
+          <Image source={require('../../assets/images/navigationIcon.png')} style={{width: 22, height: 22, marginRight:3}}/>
           <Text style={{ color: 'white', fontWeight:"bold"}}>Follow</Text>
         </View>
       </Callout>
