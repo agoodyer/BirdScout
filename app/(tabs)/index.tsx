@@ -4,6 +4,7 @@ import {
   TextInput,
   Platform,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
@@ -105,6 +106,7 @@ export default function IdentifyScreen() {
   };
 
   const uploadPhoto = async () => {
+    setUploading(true); 
     if (!uri) return;
 
     try {
@@ -167,13 +169,15 @@ export default function IdentifyScreen() {
       console.log(artifactId);
 
       const { data: identifyData, error: identifyError } =
-        await supabase.functions.invoke("test-identify", {
+        await supabase.functions.invoke("classify-artifact", {
           body: { artifact_id: artifactId },
         });
 
       console.log(identifyData, identifyError);
     } catch (error) {
       console.error("Error uploading file:", error);
+    } finally{
+      setUploading(false); 
     }
   };
 
@@ -303,7 +307,7 @@ export default function IdentifyScreen() {
               zIndex: 10,
             }}
           >
-            ({uploading} ? <TouchableOpacity
+            {!uploading &&(<TouchableOpacity
               onPress={uploadPhoto}
               style={{
                 paddingInline: 30,
@@ -322,7 +326,8 @@ export default function IdentifyScreen() {
               >
                 Identify
               </Text>
-            </TouchableOpacity>)
+            </TouchableOpacity>)}
+            {uploading && (<ActivityIndicator size="large" color="#006FFD" />)}
           </View>
 
           <Image
