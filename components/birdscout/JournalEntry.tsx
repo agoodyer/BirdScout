@@ -21,7 +21,7 @@ export function JournalEntry({
         commonName:sighting.commonName,
         speciesName:sighting.speciesName,
         date:sighting.artifact.date,
-        location: sighting.artifact.location.latitude.toString() + ", " +  sighting.artifact.location.latitude.toString() ,
+        location: sighting.artifact.location.latitude.toString() + ", " +  sighting.artifact.location.longitude.toString() ,
         notes:"We need to add notes to the database if we want info here.",
         shortDesc:"We need to add description to the database if we want info here.",
         longDesc:"We need to add description to the database if we want info here.",
