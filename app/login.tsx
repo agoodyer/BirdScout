@@ -36,8 +36,8 @@ export default function Login({ setIsLoggedIn }: any) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={{ flexDirection: "row", alignItems: "center"}}>
         <Image
-          source={require("@/assets/images/icon_silhouette.png")}
-          style={{ width: 180, opacity: 0.8 }}
+          source={require("@/assets/images/icon.png")}
+          style={{ width: 120, opacity: 0.8}}
           resizeMode="contain"
         />
       </View>
