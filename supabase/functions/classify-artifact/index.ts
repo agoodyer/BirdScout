@@ -107,3 +107,9 @@ curl -i --location --request POST 'http://localhost:8000' \
 //06ac0c40-957c-48f9-92e1-b6e69cef219f
 
 //58ba3238-403b-4694-9323-7fdfd1a7cc62
+
+
+// curl -L -X POST 'https://silypxhanlxapseqeqtt.supabase.co/functions/v1/classify-artifact' \
+//   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4' \
+//   -H 'Content-Type: application/json' \
+//   --data '{"artifact_id":"f938388e-6ef5-4766-9c42-fbd7e525fbe7"}'
