@@ -10,7 +10,6 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import IdentifyIcon from '../../assets/ui/identifyIcon';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -57,6 +56,8 @@ export default function IdentifyScreen() {
   const [showTextInput, setShowTextInput] = useState(false);
   const [inputText, setInputText] = useState("");
 
+  const [uploading, setUploading] = useState(false); 
+
   const ref = useRef<CameraView>(null);
 
   // Initialize Supabase client
@@ -66,7 +67,6 @@ export default function IdentifyScreen() {
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images", "videos"],
       allowsEditing: true,
@@ -140,11 +140,10 @@ export default function IdentifyScreen() {
       console.log("File uploaded successfully:", data);
 
       const imagePath = data.path;
-
       const latitude = location.latitude;
       const longitude = location.longitude;
 
-      const username = auth.currentUser?.displayName || "anonymous";
+      const username = auth.currentUser?.displayName || "anonymous user";
 
       const { data: artifactData, error: insertError } = await supabase
         .from("artifacts")
@@ -304,7 +303,7 @@ export default function IdentifyScreen() {
               zIndex: 10,
             }}
           >
-            <TouchableOpacity
+            ({uploading} ? <TouchableOpacity
               onPress={uploadPhoto}
               style={{
                 paddingInline: 30,
@@ -323,7 +322,7 @@ export default function IdentifyScreen() {
               >
                 Identify
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity>)
           </View>
 
           <Image
