@@ -23,8 +23,8 @@ export function JournalEntry({
         date:sighting.artifact.date,
         location: sighting.artifact.location.latitude.toString() + ", " +  sighting.artifact.location.longitude.toString() ,
         notes:"We need to add notes to the database if we want info here.",
-        shortDesc:"We need to add description to the database if we want info here.",
-        longDesc:"We need to add description to the database if we want info here.",
+        shortDesc:"",
+        longDesc:sighting.description,
         foundBy:sighting.artifact.username
       },
     });
