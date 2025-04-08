@@ -5,6 +5,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -32,6 +33,10 @@ import { fetchSightings } from "@/api/fetchSightings";
 export default function TabTwoScreen() {
   const [hasPermission, setHasPermission] = useState(false);
   const [locationEnabled, setLocationEnabled] = useState(false);
+  const [selectedSighting, setSelectedSighting] = useState<Sighting | null>(
+    null
+  );
+  const [modalVisible, setModalVisible] = useState(false);
   const [userLocation, setUserLocation] = useState<null | LocationObjectCoords>(
     null
   );
@@ -147,10 +152,29 @@ export default function TabTwoScreen() {
             style={{ opacity: Platform.OS === "android" ? 1 : 0 }}
             icon={require("../../assets/images/icon_small.png")}
             pinColor="#000"
+            onPress={() => {
+              setSelectedSighting(sighting);
+              setModalVisible(true);
+            }}
           >
-            <Callout>
-              <MapSighting sighting={sighting}></MapSighting>
-            </Callout>
+            <Modal
+              visible={modalVisible}
+              transparent
+              onRequestClose={() => setModalVisible(false)}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <MapSighting
+                  sighting={selectedSighting}
+                  onClose={() => setModalVisible(false)}
+                />
+              </View>
+            </Modal>
           </Marker>
         ))}
       </MapView>
@@ -179,50 +203,89 @@ const getDirections = (sighting) => {
   Linking.openURL(url);
 };
 
-const MapSighting = ({ sighting }: { sighting: Sighting }) => {
-  console.log("sighting", sighting);
+const MapSighting = ({
+  sighting,
+  onClose,
+}: {
+  sighting: Sighting;
+  onClose: () => void;
+}) => {
   return (
-    <View style={{ height: 200, justifyContent: "center", gap: 4 }}>
+    <View
+      style={{
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 16,
+        width: "100%",
+        maxWidth: 300,
+        alignSelf: "center",
+        elevation: 1,
+      }}
+    >
+      <TouchableOpacity
+        onPress={onClose}
+        style={{ alignSelf: "flex-end", marginBottom: 8 }}
+      >
+        <Text style={{ fontWeight: "bold" }}>Close</Text>
+      </TouchableOpacity>
+
       <Image
         source={{ uri: sighting.artifact.imageUrl }}
-        style={{ width: 200, height: 100, borderRadius: 10 }}
+        style={{
+          width: "100%",
+          aspectRatio: 3 / 2,
+          borderRadius: 10,
+          marginBottom: 8,
+        }}
       />
-      <Text style={{ fontWeight: "bold", width: "100%" }}>
+
+      <Text style={{ fontWeight: "bold", fontSize: 16 }}>
         {sighting.commonName}
       </Text>
-      <Text style={{ width: "100%" }}>{sighting.speciesName}</Text>
+      <Text style={{ marginBottom: 8 }}>{sighting.speciesName}</Text>
 
-      <View style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
-        <MaterialIcons name="calendar-month" size={24} color={"black"} />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 4,
+          marginBottom: 4,
+        }}
+      >
+        <MaterialIcons name="calendar-month" size={20} color="black" />
         <Text>{sighting.artifact.date}</Text>
       </View>
 
-      <View style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
-        <MaterialIcons name="person" size={24} color={"black"} />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 4,
+          marginBottom: 4,
+        }}
+      >
+        <MaterialIcons name="person" size={20} color="black" />
         <Text>{sighting.artifact.username}</Text>
       </View>
 
-      <View>
-        <Callout onPress={() => getDirections(sighting)}>
-          <View
-            style={{
-              backgroundColor: "#00BDFF",
-              alignItems: "center",
-              borderRadius: 20,
-              padding: 6,
-              marginTop: 58,
-              marginLeft: 108,
-              flexDirection: "row",
-            }}
-          >
-            <Image
-              source={require("../../assets/images/navigationIcon.png")}
-              style={{ width: 22, height: 22, marginRight: 3 }}
-            />
-            <Text style={{ color: "white", fontWeight: "bold" }}>Follow</Text>
-          </View>
-        </Callout>
-      </View>
+      <TouchableOpacity
+        onPress={() => getDirections(sighting)}
+        style={{
+          backgroundColor: "#00BDFF",
+          flexDirection: "row",
+          alignItems: "center",
+          padding: 8,
+          borderRadius: 16,
+          marginTop: 12,
+          alignSelf: "flex-start",
+        }}
+      >
+        <Image
+          source={require("../../assets/images/navigationIcon.png")}
+          style={{ width: 20, height: 20, marginRight: 6 }}
+        />
+        <Text style={{ color: "white", fontWeight: "bold" }}>Follow</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -267,10 +330,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     width: 220,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
     elevation: 3,
   },
   calloutImage: {
