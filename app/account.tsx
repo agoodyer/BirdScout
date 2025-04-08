@@ -27,8 +27,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { auth } from "@/store/firebaseConfig";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export default function Account() {
+  const color = useThemeColor({}, "text");
+
   const router = useRouter();
   const user = auth.currentUser;
   const [isPremium, setIsPremium] = useState(false);
@@ -49,10 +52,17 @@ export default function Account() {
 
   return (
     <>
-      <ThemedView style={styles.titleContainer}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Octicons name="chevron-left" size={24} color="black" />
+      {/* Header with back button */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color={color} />
+          <ThemedText style={styles.backText}>Back</ThemedText>
         </TouchableOpacity>
+      </View>
+      <ThemedView style={styles.titleContainer}>
         <ThemedText type="subtitle">Account Settings</ThemedText>
       </ThemedView>
 
@@ -122,6 +132,23 @@ export default function Account() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    paddingTop: 50,
+    backgroundColor: "rgba(211, 211, 211, 0.2)",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backText: {
+    marginLeft: 5,
+    fontSize: 16,
+  },
   headerImage: {
     color: "#808080",
     bottom: -90,
@@ -129,7 +156,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   titleContainer: {
-    paddingTop: "20%",
+    paddingTop: "5%",
     flexDirection: "row",
     gap: 8,
     justifyContent: "center",

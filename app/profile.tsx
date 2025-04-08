@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { Octicons } from "@expo/vector-icons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, StyleSheet, View, Image } from "react-native";
 import { Platform } from "react-native";
@@ -8,8 +8,11 @@ import { auth, db } from "../store/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export default function Profile() {
+  const color = useThemeColor({}, "text");
+
   const [phone, setPhone] = useState("No phone number found");
 
   const router = useRouter();
@@ -37,23 +40,23 @@ export default function Profile() {
       const premiumStatus = await AsyncStorage.getItem("isPremium");
       setIsPremium(premiumStatus === "true");
     };
-  
+
     checkPremiumStatus();
   }, []);
-  
+
   return (
     <>
-      {/* Header */}
-      <ThemedView
-        style={{ ...styles.titleContainer, paddingTop: isAndroid ? 40 : "20%" }}
-      >
-        <TouchableOpacity onPress={() => router.back()}>
-          <Octicons name="chevron-left" size={28} color="black" />
+      {/* Header with back button */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color={color} />
+          <ThemedText style={styles.backText}>Profile</ThemedText>
         </TouchableOpacity>
-        <ThemedText type="title" style={styles.title}>
-          Profile
-        </ThemedText>
-      </ThemedView>
+      </View>
+
       <ThemedView style={styles.container}>
         {/* Profile Picture */}
         <View style={styles.avatarContainer}>
@@ -84,7 +87,7 @@ export default function Profile() {
             <ThemedText style={styles.value}>{phone}</ThemedText>
           </View>
           <View style={styles.infoRowLast}>
-          <ThemedText type="subtitle" style={styles.label}>
+            <ThemedText type="subtitle" style={styles.label}>
               Account Status
             </ThemedText>
             <ThemedText style={styles.value}>
@@ -105,6 +108,23 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    paddingTop: 50,
+    backgroundColor: "rgba(211, 211, 211, 0.2)",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backText: {
+    marginLeft: 5,
+    fontSize: 16,
+  },
   container: {
     flex: 1,
     alignItems: "center",

@@ -11,7 +11,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import IdentifyIcon from '../../assets/ui/identifyIcon';
+import IdentifyIcon from "../../assets/ui/identifyIcon";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -22,6 +22,7 @@ import { auth, db } from "../../store/firebaseConfig";
 
 import { createClient } from "@supabase/supabase-js";
 import * as FileSystem from "expo-file-system";
+import IdentificationResultScreen from "@/components/birdscout/IdentificationResults";
 
 const useLocation = () => {
   const [location, setLocation] = useState<{
@@ -57,7 +58,9 @@ export default function IdentifyScreen() {
   const [showTextInput, setShowTextInput] = useState(false);
   const [inputText, setInputText] = useState("");
 
-  const [uploading, setUploading] = useState(false); 
+  const [uploading, setUploading] = useState(false);
+
+  const [identificationData, setIdentificationData] = useState<any>(null);
 
   const ref = useRef<CameraView>(null);
 
@@ -106,7 +109,7 @@ export default function IdentifyScreen() {
   };
 
   const uploadPhoto = async () => {
-    setUploading(true); 
+    setUploading(true);
     if (!uri) return;
 
     try {
@@ -174,10 +177,11 @@ export default function IdentifyScreen() {
         });
 
       console.log(identifyData, identifyError);
+      setIdentificationData(identifyData);
     } catch (error) {
       console.error("Error uploading file:", error);
-    } finally{
-      setUploading(false); 
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -189,10 +193,16 @@ export default function IdentifyScreen() {
     setShowTextInput((prev) => !prev);
   };
 
-  const handleDummySubmit = () => {
-    console.log("Submitted text:", inputText);
-    console.log("Current photo URI:", uri);
-  };
+  if (identificationData) {
+    return (
+      <View style={styles.container}>
+        <IdentificationResultScreen
+          bird={identificationData.llm_result}
+          setIdentificationData={setIdentificationData}
+        />
+      </View>
+    );
+  }
 
   if (!permission) return <View />;
   if (!permission.granted) {
@@ -253,14 +263,18 @@ export default function IdentifyScreen() {
           </View>
 
           <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleDummySubmit}
-            >
-              <Text style={{ color: "white", fontWeight: "bold" }}>
-                🔍 Identify Bird
-              </Text>
-            </TouchableOpacity>
+            {uploading ? (
+              <ActivityIndicator size="large" color="#006FFD" />
+            ) : (
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={uploadPhoto}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  🔍 Identify Bird
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </KeyboardAwareScrollView>
       ) : !uri ? (
@@ -307,27 +321,33 @@ export default function IdentifyScreen() {
               zIndex: 10,
             }}
           >
-            {!uploading &&(<TouchableOpacity
-              onPress={uploadPhoto}
-              style={{
-                paddingInline: 30,
-                paddingBlock: 10,
-                opacity: 0.9,
-                backgroundColor: "white",
-                borderRadius: 200,
-                justifyContent: "center",
-                alignItems: "center",
-                gap:5
-              }}
-            >
-             <IdentifyIcon width={40} height={28} fill="#006FFD"  />
-              <Text
-                style={{ color: "#71727A", fontSize: 16, textAlign: "center" }}
+            {!uploading && (
+              <TouchableOpacity
+                onPress={uploadPhoto}
+                style={{
+                  paddingInline: 30,
+                  paddingBlock: 10,
+                  opacity: 0.9,
+                  backgroundColor: "white",
+                  borderRadius: 200,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 5,
+                }}
               >
-                Identify
-              </Text>
-            </TouchableOpacity>)}
-            {uploading && (<ActivityIndicator size="large" color="#006FFD" />)}
+                <IdentifyIcon width={40} height={28} fill="#006FFD" />
+                <Text
+                  style={{
+                    color: "#71727A",
+                    fontSize: 16,
+                    textAlign: "center",
+                  }}
+                >
+                  Identify
+                </Text>
+              </TouchableOpacity>
+            )}
+            {uploading && <ActivityIndicator size="large" color="#006FFD" />}
           </View>
 
           <Image
