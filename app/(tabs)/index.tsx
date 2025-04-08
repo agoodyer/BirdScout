@@ -193,11 +193,6 @@ export default function IdentifyScreen() {
     setShowTextInput((prev) => !prev);
   };
 
-  const handleDummySubmit = () => {
-    console.log("Submitted text:", inputText);
-    console.log("Current photo URI:", uri);
-  };
-
   if (identificationData) {
     return (
       <View style={styles.container}>
@@ -268,14 +263,18 @@ export default function IdentifyScreen() {
           </View>
 
           <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleDummySubmit}
-            >
-              <Text style={{ color: "white", fontWeight: "bold" }}>
-                🔍 Identify Bird
-              </Text>
-            </TouchableOpacity>
+            {uploading ? (
+              <ActivityIndicator size="large" color="#006FFD" />
+            ) : (
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={uploadPhoto}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  🔍 Identify Bird
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </KeyboardAwareScrollView>
       ) : !uri ? (
