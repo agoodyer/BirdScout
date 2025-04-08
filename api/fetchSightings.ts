@@ -24,7 +24,8 @@ export const fetchSightings = async(username: string | null = null) =>{
       image_path,
       username,
       text_description
-    )
+    ), 
+    description
   `);
 
 
@@ -70,7 +71,8 @@ export const fetchSightings = async(username: string | null = null) =>{
         imageUrl: `${baseurl}${artifact.image_path}`, 
         username: artifact.username || 'anonymous user'
 
-      }
+      },
+      row?.description || "No Description"
     )
 
   }); 
