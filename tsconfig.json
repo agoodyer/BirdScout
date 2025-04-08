@@ -3,10 +3,15 @@
   "compilerOptions": {
     "strict": false,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./*"]
+    },
+    "module": "esnext",               // ✔ needed for import assertions
+    "target": "esnext",               // ✔ modern JS
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleResolution": "bundler",       // ✔ resolves .json modules properly
+    "resolveJsonModule": true,        // ✔ allows importing JSON
+    "allowSyntheticDefaultImports": true // ✔ avoids weird import errors
   },
   "include": [
     "**/*.ts",
