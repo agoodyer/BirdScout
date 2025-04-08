@@ -2,102 +2,108 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { ScrollView } from "react-native-gesture-handler";
 
 const IdentificationResultScreen = ({ bird, setIdentificationData }) => {
   const isUnknown = !bird || bird.commonName === "No bird found";
 
   return (
-    <View style={styles.container}>
-      {/* Close (X) button */}
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => setIdentificationData(null)}
+    <View>
+      <ScrollView
+        contentContainerStyle={{ padding: 16 }}
+        showsVerticalScrollIndicator={false}
       >
-        <Ionicons name="close" size={28} color="#333" />
-      </TouchableOpacity>
+        {/* Close (X) button */}
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => setIdentificationData(null)}
+        >
+          <Ionicons name="close" size={28} color="#333" />
+        </TouchableOpacity>
 
-      {/* Bird Image */}
-      {bird?.artifact?.imageUrl && (
-        <Image
-          source={{ uri: bird.artifact.imageUrl }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      )}
+        {/* Bird Image */}
+        {bird?.artifact?.imageUrl && (
+          <Image
+            source={{ uri: bird.artifact.imageUrl }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        )}
 
-      {/* If no bird was confidently identified */}
-      {isUnknown ? (
-        <>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "space-between",
-              paddingVertical: 40,
-            }}
-          >
-            <View>
-              <Text style={styles.commonName}>No Bird Found</Text>
-              <Text style={styles.description}>
-                We couldn't confidently identify the bird. Try again with a
-                clearer photo or different characteristics.
-              </Text>
+        {/* If no bird was confidently identified */}
+        {isUnknown ? (
+          <>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "space-between",
+                paddingVertical: 40,
+              }}
+            >
+              <View>
+                <Text style={styles.commonName}>No Bird Found</Text>
+                <Text style={styles.description}>
+                  We couldn't confidently identify the bird. Try again with a
+                  clearer photo or different characteristics.
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.centeredButton}
+                onPress={() => setIdentificationData(null)}
+              >
+                <Text style={styles.buttonText}>Back to Identification</Text>
+              </TouchableOpacity>
             </View>
+          </>
+        ) : (
+          <>
+            {/* Bird Info */}
+            <Text style={styles.commonName}>{bird.commonName}</Text>
+            <Text style={styles.speciesName}>{bird.speciesName}</Text>
+            <Text style={styles.description}>{bird.description}</Text>
 
-            <TouchableOpacity
-              style={styles.centeredButton}
-              onPress={() => setIdentificationData(null)}
-            >
-              <Text style={styles.buttonText}>Back to Identification</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      ) : (
-        <>
-          {/* Bird Info */}
-          <Text style={styles.commonName}>{bird.commonName}</Text>
-          <Text style={styles.speciesName}>{bird.speciesName}</Text>
-          <Text style={styles.description}>{bird.description}</Text>
-
-          {/* Bottom Buttons */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => setIdentificationData(null)}
-            >
-              <Text style={styles.buttonText}>Back to Identification</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() =>
-                router.push({
-                  pathname: "/birdDetail",
-                  params: {
-                    id: bird.id,
-                    image:
-                      typeof bird.artifact.imageUrl === "string"
-                        ? bird.artifact.imageUrl
-                        : "",
-                    commonName: bird.commonName,
-                    speciesName: bird.speciesName,
-                    date: bird.artifact.date,
-                    location:
-                      bird.artifact.location.latitude.toString() +
-                      ", " +
-                      bird.artifact.location.longitude.toString(),
-                    notes:
-                      "We need to add notes to the database if we want info here.",
-                    shortDesc: "",
-                    longDesc: bird.description,
-                    foundBy: bird.artifact.username,
-                  },
-                })
-              }
-            >
-              <Text style={styles.buttonText}>View in Journal</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+            {/* Bottom Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={() => setIdentificationData(null)}
+              >
+                <Text style={styles.buttonText}>Back to Identification</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={() =>
+                  router.push({
+                    pathname: "/birdDetail",
+                    params: {
+                      id: bird.id,
+                      image:
+                        typeof bird.artifact.imageUrl === "string"
+                          ? bird.artifact.imageUrl
+                          : "",
+                      commonName: bird.commonName,
+                      speciesName: bird.speciesName,
+                      date: bird.artifact.date,
+                      location:
+                        bird.artifact.location.latitude.toString() +
+                        ", " +
+                        bird.artifact.location.longitude.toString(),
+                      notes:
+                        "We need to add notes to the database if we want info here.",
+                      shortDesc: "",
+                      longDesc: bird.description,
+                      foundBy: bird.artifact.username,
+                    },
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>View in Journal</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -119,9 +125,10 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 220,
+    aspectRatio: 6 / 8,
     borderRadius: 12,
     marginBottom: 20,
+    marginTop: 40,
   },
   commonName: {
     fontSize: 24,
@@ -156,6 +163,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
+    alignSelf: "stretch",
+    justifyContent: "center",
   },
   secondaryButton: {
     flex: 0.48,

@@ -15,6 +15,8 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import Login from "../login";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -27,7 +29,7 @@ export default function TabLayout() {
   const login = <Login setIsLoggedIn={setIsLoggedIn} />;
 
   const output = (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemedView
         style={{
           height: 120,
@@ -120,7 +122,7 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-    </>
+    </GestureHandlerRootView>
   );
 
   return isLoggedIn ? output : login;
