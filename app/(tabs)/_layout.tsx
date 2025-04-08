@@ -85,7 +85,7 @@ export default function TabLayout() {
           options={{
             title: "Map",
             tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="map.fill" color={color} />
+              <Ionicons name="map" size={28} color={color} />
             ),
           }}
         />
@@ -95,7 +95,7 @@ export default function TabLayout() {
           options={{
             title: "Identify",
             tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="camera.fill" color={color} />
+              <Ionicons name="camera" size={28} color={color} />
             ),
           }}
         />
@@ -105,7 +105,7 @@ export default function TabLayout() {
           options={{
             title: "Journal",
             tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="book.fill" color={color} />
+              <Ionicons name="book" size={28} color={color} />
             ),
           }}
         />
@@ -115,7 +115,7 @@ export default function TabLayout() {
           options={{
             title: "Achievements",
             tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="star.fill" color={color} />
+              <Ionicons name="star" size={28} color={color} />
             ),
           }}
         />
