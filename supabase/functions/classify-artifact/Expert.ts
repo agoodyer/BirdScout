@@ -1,9 +1,10 @@
-
-import { Sighting } from "./sighting";
-import { Artifact } from "./artifact";
+//expert.ts
+import { Sighting } from "./sighting.tsx";
+import { Artifact } from "./artifact.tsx";
 
 export interface Expert {
-
-identify(artifact:Artifact): Promise<Sighting>; 
-
+    identify(artifact: Artifact): Promise<{
+        sighting: Sighting;
+        confidence: number;
+    }>;
 }

@@ -7,101 +7,138 @@
 // This file defines the cloud function to be executed upon artifact upload
 
 // @ts-ignore: Ignore Deno import since it's not used in this environment
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
+import { createClient } from "npm:@supabase/supabase-js";
 import "https://deno.land/x/dotenv/load.ts";
-import { LLMExpert } from "./LLMExpert";
-import { Artifact } from "./artifact";
+import { LLMExpert } from "./LLMExpert.ts";
+import { RuleBasedExpert } from "./RuleBasedExpert.ts";
+import { GeoExpert } from "./GeoExpert.ts";
+import { Blackboard } from "./blackboard.ts";
+import { Controller } from "./controller.ts";
+import { Artifact } from "./artifact.tsx";
+
 
 const supabase = createClient(
-  // @ts-ignore: Ignore Deno  since it's not used in this environment
-  Deno.env.get("SUPABASE_URL")!,
-  // @ts-ignore: Ignore Deno  since it's not used in this environment
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")! // Use service role for DB writes
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-async function fetchArtifact(artifactId: string): Promise<Artifact> {
-  const baseurl =
-    "https://silypxhanlxapseqeqtt.supabase.co/storage/v1/object/public/birds/";
-  const { data: artifactData, error: fetchError } = await supabase
+// fetchArtifact now matches the Artifact interface correctly
+async function fetchArtifact(id: string): Promise<Artifact> {
+  const { data, error } = await supabase
     .from("artifacts")
     .select("*")
-    .eq("id", artifactId)
+    .eq("id", id)
     .single();
 
-  if (fetchError || !artifactData) {
-    throw new Error("Artifact not found");
-  }
+  if (error || !data) throw new Error("Artifact not found");
 
   return {
-    id: artifactData.id.toString(),
+    id: data.id,
     location: {
-      latitude: artifactData.latitude,
-      longitude: artifactData.longitude,
+      latitude: data.latitude,
+      longitude: data.longitude
     },
-    date: new Date(artifactData.date.replace(" ", "T")).toLocaleDateString(
-      "en-US",
-      {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      }
-    ),
-
-    imageUrl: `${baseurl}${artifactData.image_path}`,
-    username: artifactData.username || "anonymous user",
+    created_at: data.date, // maps to 'created_at' in interface
+    imageUrl: data.image_path, // maps to 'imageUrl' in interface
+    username: data.username,
+    textDescription: typeof data.text_description === "object"
+      ? data.text_description.text
+      : data.text_description || ""
   };
 }
 
-// @ts-ignore: Ignore Deno  since it's not used in this environment
+// @ts-ignore: Ignore Deno since it's not used in this environment
 Deno.serve(async (req) => {
-  const body = await req.json();
-  const artifactId = body.artifact_id;
+  try {
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON payload", success: false }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
-  const artifact = await fetchArtifact(artifactId); //fetch artifact from database
+    if (!body?.artifact_id) {
+      return new Response(JSON.stringify({ error: "Missing artifact_id in request body", success: false }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
-  // @ts-ignore: Ignore Deno  since it's not used in this environment
-  const llmExpert = new LLMExpert(Deno.env.get("OPENAI_KEY")!);
-  const llm_result = await llmExpert.identify(artifact);
+    //Fetch artifact from DB
+    let artifact;
+    try {
+      artifact = await fetchArtifact(body.artifact_id);
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message, success: false }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
-  if (llm_result) {
-    const { error: insertError } = await supabase.from("sightings").upsert(
+    const llmExpert = new LLMExpert(process.env.OPENAI_KEY!);
+    const geoExpert = new GeoExpert();
+    const ruleBasedExpert = new RuleBasedExpert();
+
+    const blackboard = new Blackboard(artifact);
+    const controller = new Controller([
+      { expert: llmExpert, name: "LLM Expert" },
+      { expert: geoExpert, name: "Geo Expert" },
+      { expert: ruleBasedExpert, name: "Rule Based Expert" }
+    ]);
+
+    //Process using controller
+    await controller.processArtifact(blackboard);
+    const finalDecision = blackboard.getFinalDecision();
+
+    if (!finalDecision) {
+      return new Response(JSON.stringify({ error: "Bird identification failed", success: false }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    //Save results to Supabase
+    const { error: insertError } = await supabase.from("sightings_duplicate").upsert(
       {
         artifact_id: artifact.id,
-        common_name: llm_result.commonName,
-        species_name: llm_result.speciesName,
-        description: llm_result.description,
+        common_name: finalDecision.common_name,
+        species_name: finalDecision.species_name,
+        description: finalDecision.description,
+        confidence: finalDecision.confidence,
+        expert_type: finalDecision.expert_type
       },
       { onConflict: ["artifact_id"] }
     );
 
     if (insertError) {
-      return new Response(JSON.stringify({ error: insertError.message }), {
+      return new Response(JSON.stringify({ error: insertError.message, success: false }), {
         status: 500,
+        headers: { "Content-Type": "application/json" }
       });
     }
+
+    //Return result
+    return new Response(
+      JSON.stringify({
+        success: true,
+        result: {
+          commonName: finalDecision.common_name,
+          speciesName: finalDecision.species_name,
+          description: finalDecision.description,
+          confidence: finalDecision.confidence,
+          expertType: finalDecision.expert_type
+        }
+      }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return new Response(JSON.stringify({ error: "Internal server error", success: false }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
   }
-
-  return new Response(JSON.stringify({ success: true, llm_result }), {
-    headers: { "Content-Type": "application/json" },
-  });
 });
-
-/* To invoke locally:
-
-  1. in this directory (IMPORTANT) run: deno run --allow-net --allow-env index.ts
-  2. Make an HTTP request:
-
-curl -i --location --request POST 'http://localhost:8000' \
-  --header 'Content-Type: application/json' \
-  --data '{"artifact_id":"58ba3238-403b-4694-9323-7fdfd1a7cc62"}'
-
-*/
-
-//06ac0c40-957c-48f9-92e1-b6e69cef219f
-
-//58ba3238-403b-4694-9323-7fdfd1a7cc62
-
-// curl -L -X POST 'https://silypxhanlxapseqeqtt.supabase.co/functions/v1/classify-artifact' \
-//   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4' \
-//   -H 'Content-Type: application/json' \
-//   --data '{"artifact_id":"f938388e-6ef5-4766-9c42-fbd7e525fbe7"}'
