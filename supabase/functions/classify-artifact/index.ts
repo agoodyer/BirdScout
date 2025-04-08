@@ -1,3 +1,11 @@
+// Follow this setup guide to integrate the Deno language server with your editor:
+// https://deno.land/manual/getting_started/setup_your_environment
+// This enables autocomplete, go to definition, etc.
+
+// Setup type definitions for built-in Supabase Runtime APIs
+
+// This file defines the cloud function to be executed upon artifact upload
+
 // @ts-ignore: Ignore Deno import since it's not used in this environment
 import { createClient } from "npm:@supabase/supabase-js";
 import "https://deno.land/x/dotenv/load.ts";
@@ -13,7 +21,6 @@ const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
 
 // fetchArtifact now matches the Artifact interface correctly
 async function fetchArtifact(id: string): Promise<Artifact> {
@@ -71,7 +78,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    //Set up experts
     const llmExpert = new LLMExpert(process.env.OPENAI_KEY!);
     const geoExpert = new GeoExpert();
     const ruleBasedExpert = new RuleBasedExpert();
