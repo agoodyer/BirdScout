@@ -66,9 +66,11 @@ export function JournalEntry({
 
 const styles = StyleSheet.create({
   container: {
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderColor: "#D3D3D3",
-    padding: 15
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    margin: 0,
   },
   entryContainer: {
     flexDirection: "row",
