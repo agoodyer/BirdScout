@@ -15,30 +15,49 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "@/store/firebaseConfig";
 import { useEffect, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import { fetchSightings } from "@/api/fetchSightings";
+import { Sighting } from "../types/sighting";
+
+const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Achievements() {
   const [count, setCount] = useState(0);
 
   const user = auth.currentUser;
 
-  const fetchData = async () => {
-    const birdsRef = collection(db, "birdSightings");
-
-    const q = query(birdsRef, where("userId", "==", user!.uid.toString()));
-
-    // const querySnapshot = await getDocs(q);
-
-    // querySnapshot.forEach((doc) => {
-    //   console.log(doc.id, " => ", doc.data());
-    // });
-
-    const snapshot = await getCountFromServer(q);
-    setCount(snapshot.data().count);
-  };
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchData();
-  }, [user]);
+    onRefresh();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Fetch the sightings for the specific user by their name
+      const { data, error, count } = await supabase
+        .from("artifacts") // Replace with your table name
+        .select("*", { count: "exact" }) // The 'count: exact' option gives you the total count of rows
+        .eq("username", user.displayName); // Adjust 'user_name' to the column name you use for user's name
+
+      if (error) {
+        console.log("Error fetching sightings:", error.message);
+        return;
+      }
+
+      console.log("Fetched sightings:", data, count);
+
+      setCount(count);
+    } catch (err) {
+      console.log("Failed to refresh sightings", err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <FlatList

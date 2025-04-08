@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { Octicons } from "@expo/vector-icons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
   TouchableOpacity,
@@ -14,9 +14,11 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
 import React from "react";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export default function Payment() {
   const router = useRouter();
+  const color = useThemeColor({}, "text");
 
   const [cardholder, setCardholder] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -40,12 +42,19 @@ export default function Payment() {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <ThemedView style={styles.titleContainer}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Octicons name="chevron-left" size={24} color="black" />
+      {/* Header with back button */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color={color} />
+          <ThemedText style={styles.backText}>Back</ThemedText>
         </TouchableOpacity>
+      </View>
+      <View style={styles.titleContainer}>
         <ThemedText type="subtitle">Payment Info</ThemedText>
-      </ThemedView>
+      </View>
 
       <View style={styles.formContainer}>
         <TextInput
@@ -97,8 +106,25 @@ export default function Payment() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    paddingTop: 50,
+    backgroundColor: "rgba(211, 211, 211, 0.2)",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backText: {
+    marginLeft: 5,
+    fontSize: 16,
+  },
   titleContainer: {
-    paddingTop: "20%",
+    paddingTop: "5%",
     flexDirection: "row",
     gap: 8,
     justifyContent: "center",
