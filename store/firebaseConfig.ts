@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "***REMOVED***",
+  apiKey: import.meta.env.FIREBASE_API_KEY || '',
   projectId: "birdscoutusers",
   storageBucket: "birdscoutusers.firebasestorage.app",
   messagingSenderId: "218951388893",

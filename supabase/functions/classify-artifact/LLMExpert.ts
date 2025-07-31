@@ -2,11 +2,11 @@ import { Artifact } from "./artifact";
 import { Sighting } from "./sighting";
 import { Expert } from "./Expert";
 
-const baseurl = "https://silypxhanlxapseqeqtt.supabase.co/storage/v1/object/public/birds/"
+const baseurl = process.env.SUPABASE_STORAGE_URL || '';
 
 export class LLMExpert implements Expert {
 
-    constructor(private openAIKey: string) { }
+    constructor(private openAIKey: string = process.env.OPENAI_KEY || '') { }
 
 
     async identify(artifact: Artifact): Promise<Sighting> {

@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { sightings } from '@/assets/sightings';
 import { Sighting } from '@/app/types/sighting';
 
-const supabaseUrl = "https://silypxhanlxapseqeqtt.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbHlweGhhbmx4YXBzZXFlcXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE2NjEsImV4cCI6MjA1OTI4NzY2MX0.sh-LowT6UUgquGHtMRMtW1uYNvtHV5qm9UFL1pVqBU4"; // Replace with your Supabase anon key
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // either fetch all sigtings for a username, or return ALL sightings
@@ -46,7 +46,7 @@ export const fetchSightings = async(username: string | null = null) =>{
   }
 
 
-  const baseurl= "https://silypxhanlxapseqeqtt.supabase.co/storage/v1/object/public/birds/"
+  const baseurl = process.env.SUPABASE_STORAGE_URL || '';
   const databaseSightings = data.map((row:any)=>{
 
     const artifact = row.artifacts; 
