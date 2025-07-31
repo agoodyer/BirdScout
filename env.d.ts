@@ -1,4 +1,3 @@
-/// <reference types="react-scripts" />
 
 // Add custom type definitions for process.env
 interface ImportMetaEnv {
