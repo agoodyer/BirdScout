@@ -1,4 +1,20 @@
-# 🐦 BirdScout
+
+<table align="center" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center" valign="middle">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="assets/images/icon_white.png">
+        <source media="(prefers-color-scheme: light)" srcset="assets/images/icon_silhouette.png">
+        <img alt="BirdScout Logo" src="assets/images/icon_silhouette.png" width="90">
+      </picture>
+    </td>
+    <td align="center" valign="middle">
+      <h1>&nbsp;BirdScout</h1>
+    </td>
+  </tr>
+</table>
+
+---
 
 [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
@@ -17,7 +33,7 @@ Built as part of the **SFWRENG 3AA4 (Software Design II)** course at McMaster Un
 * 📓 **Digital Field Journal**: Keep a permanent, searchable history of your sightings with timestamps and location data.
 * ☁️ **Cloud Synchronization**: Real-time data persistence across devices powered by Supabase.
 * ⚡ **Edge Intelligence**: High-performance image ingestion and classification via serverless Edge Functions.
-* 🧭 **Community Discoveries**: Explore a global feed of bird sightings from other "Scouts" (In-Development).
+* 🧭 **Community Discoveries**: Explore a global feed of bird sightings from other "Scouts".
 
 ---
 
@@ -88,12 +104,16 @@ Built as part of the **SFWRENG 3AA4 (Software Design II)** course at McMaster Un
 
 This project was developed by a team of software engineering students at **McMaster University**:
 
-- **Aidan Goodyer** - [agoodyer](https://github.com/agoodyer)
-- **Hamza Abou Jaib** - [HamzaAbouJaib](https://github.com/HamzaAbouJaib)
-- **May Yan** - [mayyan531](https://github.com/mayyan531)
-- **Muhammad Zaka** - [zakamm](https://github.com/zakamm)
-- **Nawaal Fatima** - [NawaalFatima](https://github.com/NawaalFatima)
-- **Aravin Shankar** - [aravin04](https://github.com/aravin04)
+
+| Contributor | Role | GitHub |
+| :--- | :--- | :--- |
+| **Aidan Goodyer** | Software Engineer | [@agoodyer](https://github.com/agoodyer) |
+| **Hamza Abou Jaib** | Software Engineer | [@HamzaAbouJaib](https://github.com/HamzaAbouJaib) |
+| **May Yan** | Software Engineer | [@mayyan531](https://github.com/mayyan531) |
+| **Muhammad Zaka** | Software Engineer | [@zakamm](https://github.com/zakamm) |
+| **Nawaal Fatima** | Software Engineer | [@NawaalFatima](https://github.com/NawaalFatima) |
+| **Aravin Shankar** | Software Engineer | [@aravin04](https://github.com/aravin04) |
+
 ---
 
 ## 📜 License
