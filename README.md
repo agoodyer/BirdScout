@@ -1,125 +1,103 @@
+# BirdScout
 
-<table align="center" border="0" cellpadding="0" cellspacing="0">
-  <tr>
-    <td align="center" valign="middle">
-      <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="assets/images/icon_white.png">
-        <source media="(prefers-color-scheme: light)" srcset="assets/images/icon_silhouette.png">
-        <img alt="BirdScout Logo" src="assets/images/icon_silhouette.png" width="90">
-      </picture>
-    </td>
-    <td align="center" valign="middle">
-      <h1>&nbsp;BirdScout</h1>
-    </td>
-  </tr>
-</table>
+BirdScout is a mobile prototype for identifying birds from a photo and keeping the result in a field journal. It also includes a map of community sightings and a small achievement system.
 
----
+<img src="assets/images/birdscout.png" alt="BirdScout" width="480">
 
-[![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
-[![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+**[View the project case study](https://agoodyer.com/projects/birdscout/)**
 
-**BirdScout** is an AI-powered mobile companion designed for birdwatchers of all skill levels. By combining computer vision with a seamless cloud-native experience, BirdScout allows users to identify, log, and discover avian species in real-time.
+Six students built BirdScout over roughly four months for McMaster University's SFWRENG 3AA4 software design course. The project covered requirements, architecture, implementation, and integration rather than only the final application.
 
-Built as part of the **SFWRENG 3AA4 (Software Design II)** course at McMaster University.
+## Observation flow
 
----
+1. A user takes a photo or chooses one from their library, optionally adding notes and a location.
+2. The mobile client uploads the image to Supabase Storage and saves an artifact record in PostgreSQL.
+3. A Supabase Edge Function retrieves the artifact and asks a vision-capable model for a suggested species.
+4. The resulting sighting is saved and reused by the result, journal, map, and achievement views.
 
-## ✨ Key Features
+The application treats the model response as a suggestion, not an authoritative identification. The prototype did not include a labelled evaluation set, so it does not make an accuracy claim.
 
-* 📸 **AI Species Identification**: Snap a photo and leverage LLM-integrated vision models for high-accuracy bird classification.
-* 📓 **Digital Field Journal**: Keep a permanent, searchable history of your sightings with timestamps and location data.
-* ☁️ **Cloud Synchronization**: Real-time data persistence across devices powered by Supabase.
-* ⚡ **Edge Intelligence**: High-performance image ingestion and classification via serverless Edge Functions.
-* 🧭 **Community Discoveries**: Explore a global feed of bird sightings from other "Scouts".
+## Implemented system
 
----
+The client is an Expo and React Native application written in TypeScript. Expo Router provides file-based navigation and the Expo camera, image-picker, and location packages handle observation input.
 
-## 🛠 Tech Stack
+The prototype uses two backend services:
 
-### Frontend
-- **Framework**: [Expo](https://expo.dev/) & [React Native](https://reactnative.dev/)
-- **Routing**: [Expo Router](https://docs.expo.dev/router/introduction/) (Type-safe, file-based routing)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: NativeWind / Flexbox for responsive mobile layouts
+- **Firebase Authentication and Firestore** manage accounts and profile data.
+- **Supabase** stores photographs and sighting records and runs the classification Edge Function.
 
-### Backend & Infrastructure
-- **Database**: [Supabase](https://supabase.com/) (PostgreSQL)
-- **Storage**: Supabase Storage for high-resolution bird photography
-- **Auth**: Supabase Auth (Email/Password & OAuth)
-- **Functions**: Supabase Edge Functions for handling AI logic and metadata processing
+The Edge Function invokes GPT-4o with the photograph and optional field notes, parses the structured response, and upserts the identified sighting. Journal and map screens query the saved records; the detail screen uses OpenStreetMap's Nominatim service to turn coordinates into a readable location.
 
----
+## Designed architecture versus prototype
 
-## 🚀 Getting Started
+The course design proposed a blackboard-style identification system in which a generative model, geographic expert, and rule-based expert could contribute independently. An identification controller would combine their evidence while allowing any one expert to be replaced or temporarily unavailable.
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (LTS)
-- [Expo Go](https://expo.dev/go) app on your mobile device (for testing)
+The working prototype implements a narrower version of that idea. The deployed function instantiates one vision-model expert; the geographic and rule-based experts were not integrated into the end-to-end path. Keeping that distinction explicit matters because the architecture documents describe a more complete system than the application currently runs.
 
-### Installation
+## What I worked on
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/agoodyer/BirdScout.git
-   cd BirdScout
-   ```
+My work covered both design and implementation:
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+- drafted the initial purpose, scope, and security requirements;
+- helped define the business events and stakeholder viewpoints;
+- created the use-case and system-architecture diagrams and contributed to the subsystem and class design;
+- built the initial mobile interface and core artifact/sighting model;
+- implemented photo storage, database-backed sightings, and classification through the Edge Function;
+- integrated the journal and map data paths and handled loading, refresh, theming, and platform compatibility.
 
-3. **Configure Environment Variables**
-   Create a `.env` file in the root directory and add your Supabase credentials:
-   ```env
-   EXPO_PUBLIC_SUPABASE_URL=your_project_url
-   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-   ```
+The repository's commit history reflects that integration role, while the final product and course deliverables were shared across all six team members.
 
-4. **Start the App**
-   ```bash
-   npx expo start
-   ```
+## Development
 
----
+Requirements:
 
-## 📂 Project Structure
+- Node.js LTS
+- Expo Go or an Android/iOS emulator
 
-```text
-├── api/             # Supabase client and Edge Function calls
-├── app/             # Main application screens (Expo Router logic)
-├── assets/          # Static assets (logos, bird icons)
-├── components/      # Reusable UI components (Modals, Buttons, Cards)
-├── constants/       # Theme configuration and API constants
-├── hooks/           # Custom React hooks (Auth, Sighting Logic)
-├── store/           # Global state management
-└── supabase/        # Database schemas and migration files
+Install the locked dependencies and start Expo:
+
+```sh
+npm ci
+npx expo start
 ```
----
 
-## 👥 Contributors
+Run the existing Jest snapshot test once, without watch mode:
 
-This project was developed by a team of software engineering students at **McMaster University**:
+```sh
+npm test -- --watchAll=false --runInBand
+```
 
+The interface can be launched from a clean clone, but the end-to-end observation flow depends on configured Firebase and Supabase projects and a deployed Edge Function. The current code is coupled to the original course deployment in several places rather than packaged as a turnkey backend.
 
-| Contributor | Role | GitHub |
-| :--- | :--- | :--- |
-| **Aidan Goodyer** | Software Engineer | [@agoodyer](https://github.com/agoodyer) |
-| **Hamza Abou Jaib** | Software Engineer | [@HamzaAbouJaib](https://github.com/HamzaAbouJaib) |
-| **May Yan** | Software Engineer | [@mayyan531](https://github.com/mayyan531) |
-| **Muhammad Zaka** | Software Engineer | [@zakamm](https://github.com/zakamm) |
-| **Nawaal Fatima** | Software Engineer | [@NawaalFatima](https://github.com/NawaalFatima) |
-| **Aravin Shankar** | Software Engineer | [@aravin04](https://github.com/aravin04) |
+The Edge Function expects Supabase credentials and an OpenAI API key at runtime. Service-role and model-provider keys must remain server-side and should never be committed to a client build.
 
----
+## Repository map
 
-## 📜 License
+- `app/` — Expo Router screens for identification, accounts, journal, map, and achievements
+- `components/birdscout/` — project-specific result, journal, and settings components
+- `api/` — sighting queries and domain-object mapping
+- `store/` — Firebase client configuration
+- `supabase/functions/classify-artifact/` — classification and sighting persistence
+- `app/types/` — artifact and sighting domain types
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Current limitations
 
-<p align="center">
-  Made with ❤️ by the BirdScout Team
-</p>
+- The classifier was not evaluated as a scientific bird-identification system.
+- The proposed multi-expert architecture is only partially implemented.
+- Location privacy and opt-in community sharing were design goals, not complete prototype features.
+- Several achievements are static placeholders.
+- Backend configuration is split between environment variables and values embedded in source.
+- The automated test suite currently consists of one component snapshot test.
+
+## Team
+
+- [Aidan Goodyer](https://github.com/agoodyer)
+- [Hamza Abou Jaib](https://github.com/HamzaAbouJaib)
+- [May Yan](https://github.com/mayyan531)
+- [Muhammad Zaka](https://github.com/zakamm)
+- [Nawaal Fatima](https://github.com/NawaalFatima)
+- [Aravin Shankar](https://github.com/aravin04)
+
+## License
+
+[MIT](LICENSE)
